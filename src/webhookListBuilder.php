@@ -16,6 +16,15 @@ class webhookListBuilder extends ConfigEntityListBuilder {
   public function buildHeader() {
     $header['label'] = $this->t('Webhook');
     $header['id'] = $this->t('Machine name');
+    $header['id'] = $this->t('Machine name');
+    $header['id'] = $this->t('Machine name');
+    $header['id'] = $this->t('Machine name');
+    $header['id'] = $this->t('Machine name');
+    $header['id'] = $this->t('Machine name');
+    $header['id'] = $this->t('Machine name');
+    $header['id'] = $this->t('Machine name');
+    $header['id'] = $this->t('Machine name');
+    $header['id'] = $this->t('Machine name');
     return $header + parent::buildHeader();
   }
 
@@ -24,6 +33,15 @@ class webhookListBuilder extends ConfigEntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     $row['label'] = $entity->label();
+    $row['id'] = $entity->id();
+    $row['id'] = $entity->id();
+    $row['id'] = $entity->id();
+    $row['id'] = $entity->id();
+    $row['id'] = $entity->id();
+    $row['id'] = $entity->id();
+    $row['id'] = $entity->id();
+    $row['id'] = $entity->id();
+    $row['id'] = $entity->id();
     $row['id'] = $entity->id();
     // You probably want a few more properties here...
     return $row + parent::buildRow($entity);
