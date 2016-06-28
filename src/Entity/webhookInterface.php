@@ -53,7 +53,7 @@ interface webhookInterface extends ConfigEntityInterface {
   /**
    * @return string
    */
-  public function getEntityType();
+  public function getrefEntityType();
 
   /**
    * @return string

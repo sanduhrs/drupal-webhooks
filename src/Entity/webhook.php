@@ -100,7 +100,7 @@ class webhook extends ConfigEntityBase implements webhookInterface {
    *
    * @var string
    */
-  protected $entity_type;
+  protected $ref_entity_type;
 
   /**
    * The Webhook reference entity id.
@@ -175,7 +175,7 @@ class webhook extends ConfigEntityBase implements webhookInterface {
   /**
    * @return string
    */
-  public function getEntityType() {
+  public function getrefEntityType() {
     return $this->entity_type;
   }
 

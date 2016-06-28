@@ -21,7 +21,7 @@ class webhookListBuilder extends ConfigEntityListBuilder {
     $header['last_usage'] = $this->t('Last Usage');
     $header['events'] = $this->t('Events');
     $header['result'] = $this->t('Result');
-    $header['entity_type'] = $this->t('Entity Type');
+    $header['ref_entity_type'] = $this->t('Reference Entity Type');
     $header['entity_id'] = $this->t('Entity ID');
     $header['secret'] = $this->t('Secret');
     $header['content_type'] = $this->t('Content Type');
@@ -39,7 +39,7 @@ class webhookListBuilder extends ConfigEntityListBuilder {
     $row['last_usage'] = $entity->last_usage();
     $row['events'] = $entity->events();
     $row['result'] = $entity->result();
-    $row['entity_type'] = $entity->entity_type();
+    $row['ref_entity_type'] = $entity->ref_entity_type();
     $row['entity_id'] = $entity->entity_id();
     $row['secret'] = $entity->secret();
     $row['content_type'] = $entity->content_type();

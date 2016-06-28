@@ -26,9 +26,9 @@ webhooks.webhook.*:
     result:
       type: boolean
       label: 'Result'
-    entity_type:
+    ref_entity_type:
       type: string
-      label: 'Entity Type'
+      label: 'Reference Entity Type'
     entity_id:
       type: integer
       label: 'Entity ID'
