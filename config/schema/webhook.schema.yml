@@ -1,0 +1,21 @@
+webhooks.webhook.*:
+  type: config_entity
+  label: 'Webhook config'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Title'
+    uuid:
+      type: string
+      label: 'UUID'
+    status:
+      type: boolean
+      label: 'Status'
+    url:
+      type: string
+      label: 'URL'
+
+

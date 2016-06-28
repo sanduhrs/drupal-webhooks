@@ -1,0 +1,8 @@
+# Webhook menu items definition
+entity.webhook.collection:
+  title: 'Webhook'
+  route_name: entity.webhook.collection
+  description: 'List Webhook (bundles)'
+  parent: system.admin_structure
+  weight: 99
+
