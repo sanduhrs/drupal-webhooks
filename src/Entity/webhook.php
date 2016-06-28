@@ -115,4 +115,81 @@ class webhook extends ConfigEntityBase implements webhookInterface {
    * @var string
    */
   protected $secret;
+
+  /**
+   * @return string
+   */
+  public function getId() {
+    return $this->id;
+  }
+
+  /**
+   * @return string
+   */
+  public function getLabel() {
+    return $this->label;
+  }
+
+  /**
+   * @return string
+   */
+  public function getPayloadUrl() {
+    return $this->payload_url;
+  }
+
+  /**
+   * @return string
+   */
+  public function getEvents() {
+    return $this->events;
+  }
+
+  /**
+   * @return string
+   */
+  public function getContentType() {
+    return $this->content_type;
+  }
+
+  /**
+   * @return boolean
+   */
+  public function isStatus() {
+    return $this->status;
+  }
+
+  /**
+   * @return int
+   */
+  public function getLastUsage() {
+    return $this->last_usage;
+  }
+
+  /**
+   * @return boolean
+   */
+  public function isResult() {
+    return $this->result;
+  }
+
+  /**
+   * @return string
+   */
+  public function getEntityType() {
+    return $this->entity_type;
+  }
+
+  /**
+   * @return string
+   */
+  public function getEntityId() {
+    return $this->entity_id;
+  }
+
+  /**
+   * @return string
+   */
+  public function getSecret() {
+    return $this->secret;
+  }
 }
