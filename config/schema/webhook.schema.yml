@@ -7,7 +7,7 @@ webhooks.webhook.*:
       label: 'ID'
     label:
       type: label
-      label: 'Title'
+      label: 'Label'
     uuid:
       type: string
       label: 'UUID'
