@@ -41,13 +41,16 @@ class webhookForm extends EntityForm {
     $form['payload_url']= array(
       '#type' => 'textfield',
       '#title' => $this->t('Payload URL'),
+        '#attributes' => array(
+            'placeholder' => $this->t('http://www.example.com'),
+        ),
       '#maxlength' => 255,
       '#description' => $this->t("Target URL for your payload."),
       '#required' => TRUE,
     );
 
     $form['secret'] = array(
-      '#type' => 'password',
+      '#type' => 'password_confirm',
         '#attributes' => array(
             'placeholder' => $this->t('My placeholder text'),
         ),
