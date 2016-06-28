@@ -34,15 +34,6 @@ class webhookListBuilder extends ConfigEntityListBuilder {
   public function buildRow(EntityInterface $entity) {
     $row['label'] = $entity->label();
     $row['id'] = $entity->id();
-    $row['status'] = $entity->status();
-    $row['payload_url'] = $entity->payload_url();
-    $row['last_usage'] = $entity->last_usage();
-    $row['events'] = $entity->events();
-    $row['result'] = $entity->result();
-    $row['ref_entity_type'] = $entity->ref_entity_type();
-    $row['entity_id'] = $entity->entity_id();
-    $row['secret'] = $entity->secret();
-    $row['content_type'] = $entity->content_type();
     // You probably want a few more properties here...
     return $row + parent::buildRow($entity);
   }
