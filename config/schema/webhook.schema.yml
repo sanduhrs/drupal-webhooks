@@ -35,6 +35,9 @@ webhooks.webhook.*:
     secret:
       type: string
       label: 'Secret'
+    content_type:
+      type: string
+      label: 'Content Type'
 
 
 
