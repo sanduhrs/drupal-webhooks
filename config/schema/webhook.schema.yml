@@ -14,8 +14,27 @@ webhooks.webhook.*:
     status:
       type: boolean
       label: 'Status'
-    url:
+    payload_url:
       type: string
-      label: 'URL'
+      label: 'Payload URL'
+    last_usage:
+      type: integer
+      label: 'Last usage of a Webhook'
+    events:
+      type: string
+      label: 'Events'
+    result:
+      type: boolean
+      label: 'Result'
+    entity_type:
+      type: string
+      label: 'Entity Type'
+    entity_id:
+      type: integer
+      label: 'Entity ID'
+    secret:
+      type: string
+      label: 'Secret'
+
 
 
