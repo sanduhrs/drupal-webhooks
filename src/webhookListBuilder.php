@@ -24,7 +24,7 @@ class webhookListBuilder extends ConfigEntityListBuilder {
     $header['entity_type'] = $this->t('Entity Type');
     $header['entity_id'] = $this->t('Entity ID');
     $header['secret'] = $this->t('Secret');
-    $header['content_type'] = $this->t('Content Type ');
+    $header['content_type'] = $this->t('Content Type');
     return $header + parent::buildHeader();
   }
 
