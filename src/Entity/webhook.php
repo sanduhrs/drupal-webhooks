@@ -53,4 +53,66 @@ class webhook extends ConfigEntityBase implements webhookInterface {
    */
   protected $label;
 
+  /**
+   * The Webhook Payload URL.
+   *
+   * @var string
+   */
+  protected $payload_url;
+
+  /**
+   * The Webhook events.
+   *
+   * @var string
+   */
+  protected $events;
+
+  /**
+   * The Webhook content type.
+   *
+   * @var string
+   */
+  protected $content_type;
+
+  /**
+   * The Webhook status.
+   *
+   * @var boolean
+   */
+  protected $status;
+
+  /**
+   * The Webhook last usage.
+   *
+   * @var integer
+   */
+  protected $last_usage;
+
+  /**
+   * The Webhook result.
+   *
+   * @var boolean
+   */
+  protected $result;
+
+  /**
+   * The Webhook reference entity type.
+   *
+   * @var string
+   */
+  protected $entity_type;
+
+  /**
+   * The Webhook reference entity id.
+   *
+   * @var string
+   */
+  protected $entity_id;
+
+  /**
+   * The Webhook secret.
+   *
+   * @var string
+   */
+  protected $secret;
 }
