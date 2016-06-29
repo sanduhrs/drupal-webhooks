@@ -63,7 +63,7 @@ class Webhook extends ConfigEntityBase implements WebhookInterface {
   /**
    * The Webhook events.
    *
-   * @var string
+   * @var array
    */
   protected $events;
 
@@ -115,6 +115,14 @@ class Webhook extends ConfigEntityBase implements WebhookInterface {
    * @var string
    */
   protected $secret;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __construct(array $values, $entity_type) {
+    parent::__construct($values, $entity_type);
+    $this->events = unserialize($values['events']);
+  }
 
   /**
    * @return string
@@ -193,9 +201,4 @@ class Webhook extends ConfigEntityBase implements WebhookInterface {
     return $this->secret;
   }
 
-  public static function load($id) {
-    $entity = parent::load($id);
-    $entity->set('events', unserialize($entity->getEvents()));
-    return $entity;
-  }
 }
