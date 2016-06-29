@@ -60,7 +60,7 @@ class WebhookForm extends EntityForm {
       '#description' => $this->t("Secret that the target website gave you."),
     );
 
-    $form['status'] = array(
+    $form['active'] = array(
       '#type' => 'checkbox',
       '#title' => $this->t("Active"),
       '#description' => $this->t("Shows if the webhook is active or not."),
