@@ -29,15 +29,12 @@ webhooks.webhook.*:
     ref_entity_type:
       type: string
       label: 'Reference Entity Type'
-    entity_id:
+    ref_entity_id:
       type: integer
-      label: 'Entity ID'
+      label: 'Reference Entity ID'
     secret:
       type: string
       label: 'Secret'
     content_type:
       type: string
       label: 'Content Type'
-
-
-
