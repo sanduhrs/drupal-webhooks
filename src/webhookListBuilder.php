@@ -4,6 +4,7 @@ namespace Drupal\webhooks;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\webhooks\Entity\webhook;
 
 /**
  * Provides a listing of Webhook entities.
@@ -32,8 +33,18 @@ class webhookListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
+    $webhook = new webhook();
     $row['label'] = $entity->label();
     $row['id'] = $entity->id();
+    $row['status'] = $webhook->isStatus();
+    $row['payload_url'] = $webhook->getPayloadUrl();
+    $row['last_usage'] = $webhook->getLastUsage();
+    $row['events'] = $webhook->getEvents();
+    $row['result'] = $webhook->isResult();
+    $row['ref_entity_type'] = $webhook->getrefEntityType();
+    $row['entity_id'] = $webhook->getEntityId();
+    $row['secret'] = $webhook->getSecret();
+    $row['content_type'] = $webhook->getContentType();
     // You probably want a few more properties here...
     return $row + parent::buildRow($entity);
   }
