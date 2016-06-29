@@ -4,7 +4,6 @@ namespace Drupal\webhooks;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\webhooks\Entity\webhook;
 
 /**
  * Provides a listing of Webhook entities.
