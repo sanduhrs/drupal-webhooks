@@ -59,6 +59,22 @@ class WebhookForm extends EntityForm {
       '#description' => $this->t("Password to scramble your webhook."),
       '#required' => TRUE,
     );
+
+    $form['status'] = array(
+      '#type' => 'checkbox',
+      '#title' => $this->t("Active"),
+      '#desription' => $this->t("Shows if the webhook is active or not."),
+    );
+
+    $form['content_type'] = array(
+      '#type' => 'select',
+      '#titel' => $this->t("Content Type"),
+      '#description' => $this->t("The Content Type of your webhook."),
+      '#options' => [
+        '1' => $this->t('application/json'),
+        '2' => $this->t('application/xml'),
+      ],
+    );
     return $form;
   }
 
