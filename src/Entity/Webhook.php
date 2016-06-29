@@ -192,4 +192,10 @@ class Webhook extends ConfigEntityBase implements WebhookInterface {
   public function getSecret() {
     return $this->secret;
   }
+
+  public static function load($id) {
+    $entity = parent::load($id);
+    $entity->set('events', unserialize($entity->getEvents()));
+    return $entity;
+  }
 }

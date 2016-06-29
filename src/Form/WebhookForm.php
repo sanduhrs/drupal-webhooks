@@ -97,7 +97,7 @@ class WebhookForm extends EntityForm {
         'entity:comment:update' => ['type' => 'Comment' , 'event' => 'Update'],
         'entity:comment:delete' => ['type' => 'Comment' , 'event' => 'Delete'],
       ],
-      '#default_value' => $webhook->getEvents(),
+      //'#default_value' => $webhook->getEvents(),
     );
     return $form;
   }
@@ -106,7 +106,10 @@ class WebhookForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
+    /** @var \Drupal\webhooks\Entity\Webhook $webhook */
     $webhook = $this->entity;
+
+    $webhook->set('events', serialize($webhook->getEvents()));
     $active = $webhook->save();
 
     switch ($active) {
