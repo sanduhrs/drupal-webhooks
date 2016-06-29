@@ -9,7 +9,7 @@ use Drupal\Core\Url;
 /**
  * Builds the form to delete Webhook entities.
  */
-class webhookDeleteForm extends EntityConfirmFormBase {
+class WebhookDeleteForm extends EntityConfirmFormBase {
 
   /**
    * {@inheritdoc}
