@@ -2,10 +2,3 @@ services:
   webhooks.events:
     class: Drupal\webhooks\WebhookService
     arguments: []
-
-  webhooks.subscriber:
-    class: Drupal\webhooks\EventSubscriber\WebhookSubscriber
-    arguments: []
-    tags:
-      - { name: event_subscriber }
-
