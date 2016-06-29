@@ -121,7 +121,9 @@ class Webhook extends ConfigEntityBase implements WebhookInterface {
    */
   public function __construct(array $values, $entity_type) {
     parent::__construct($values, $entity_type);
-    $this->events = unserialize($values['events']);
+    if (iseet($values['events'])) {
+      $this->events = unserialize($values['events']);
+    }
   }
 
   /**
