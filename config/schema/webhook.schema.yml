@@ -21,7 +21,7 @@ webhooks.webhook.*:
       type: integer
       label: 'Last usage of a Webhook'
     events:
-      type: string
+      type: text
       label: 'Events'
     response_ok:
       type: boolean
