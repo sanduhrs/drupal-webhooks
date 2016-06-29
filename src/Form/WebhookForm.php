@@ -85,9 +85,9 @@ class WebhookForm extends EntityForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $webhook = $this->entity;
-    $status = $webhook->save();
+    $active = $webhook->save();
 
-    switch ($status) {
+    switch ($active) {
       case SAVED_NEW:
         drupal_set_message($this->t('Created the %label Webhook.', [
           '%label' => $webhook->label(),
