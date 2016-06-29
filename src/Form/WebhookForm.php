@@ -97,7 +97,7 @@ class WebhookForm extends EntityForm {
         'entity:comment:update' => ['type' => 'Comment' , 'event' => 'Update'],
         'entity:comment:delete' => ['type' => 'Comment' , 'event' => 'Delete'],
       ],
-      //'#default_value' => $webhook->getEvents(),
+      '#default_value' => $webhook->getEvents(),
     );
     return $form;
   }
