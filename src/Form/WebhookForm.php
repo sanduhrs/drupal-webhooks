@@ -57,7 +57,6 @@ class WebhookForm extends EntityForm {
       '#title' => $this->t('Secret'),
       '#maxlength' => 255,
       '#description' => $this->t("Secret that the target website gave you."),
-      '#required' => TRUE,
     );
 
     $form['status'] = array(
