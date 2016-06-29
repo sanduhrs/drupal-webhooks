@@ -175,7 +175,7 @@ class Webhook extends ConfigEntityBase implements WebhookInterface {
   /**
    * @return string
    */
-  public function getrefEntityType() {
+  public function getRefEntityType() {
     return $this->ref_entity_type;
   }
 
