@@ -63,7 +63,8 @@ class WebhookForm extends EntityForm {
     $form['status'] = array(
       '#type' => 'checkbox',
       '#title' => $this->t("Active"),
-      '#desription' => $this->t("Shows if the webhook is active or not."),
+      '#description' => $this->t("Shows if the webhook is active or not."),
+      '#default_value' => TRUE,
     );
 
     $form['content_type'] = array(
