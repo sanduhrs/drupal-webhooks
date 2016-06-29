@@ -9,7 +9,7 @@ use Drupal\webhooks\Entity\webhook;
 /**
  * Provides a listing of Webhook entities.
  */
-class webhookListBuilder extends ConfigEntityListBuilder {
+class WebhookListBuilder extends ConfigEntityListBuilder {
 
   /**
    * {@inheritdoc}

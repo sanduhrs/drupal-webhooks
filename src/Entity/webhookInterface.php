@@ -7,7 +7,7 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 /**
  * Provides an interface for defining Webhook entities.
  */
-interface webhookInterface extends ConfigEntityInterface {
+interface WebhookInterface extends ConfigEntityInterface {
 
   // Add get/set methods for your configuration properties here.
   /**

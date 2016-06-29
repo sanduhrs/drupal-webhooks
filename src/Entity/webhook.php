@@ -37,7 +37,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *   }
  * )
  */
-class webhook extends ConfigEntityBase implements webhookInterface {
+class Webhook extends ConfigEntityBase implements WebhookInterface {
 
   /**
    * The Webhook ID.

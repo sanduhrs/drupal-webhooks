@@ -10,7 +10,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @package Drupal\webhooks\Form
  */
-class webhookForm extends EntityForm {
+class WebhookForm extends EntityForm {
 
   /**
    * {@inheritdoc}
