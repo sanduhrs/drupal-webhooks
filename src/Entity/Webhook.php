@@ -107,7 +107,7 @@ class Webhook extends ConfigEntityBase implements WebhookInterface {
    *
    * @var string
    */
-  protected $entity_id;
+  protected $ref_entity_id;
 
   /**
    * The Webhook secret.
@@ -182,8 +182,8 @@ class Webhook extends ConfigEntityBase implements WebhookInterface {
   /**
    * @return string
    */
-  public function getEntityId() {
-    return $this->entity_id;
+  public function getRefEntityId() {
+    return $this->ref_entity_id;
   }
 
   /**

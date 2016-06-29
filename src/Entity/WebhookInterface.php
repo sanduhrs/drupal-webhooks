@@ -9,7 +9,6 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
  */
 interface WebhookInterface extends ConfigEntityInterface {
 
-  // Add get/set methods for your configuration properties here.
   /**
    * @return string
    */
@@ -58,7 +57,7 @@ interface WebhookInterface extends ConfigEntityInterface {
   /**
    * @return string
    */
-  public function getEntityId();
+  public function getRefEntityId();
 
   /**
    * @return string
