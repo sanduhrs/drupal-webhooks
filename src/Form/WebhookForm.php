@@ -78,6 +78,18 @@ class WebhookForm extends EntityForm {
       ],
       '#default_value' => $webhook->getContentType(),
     );
+
+    $form['events'] = array(
+      '#type' => 'tableselect',
+      '#header' => array('type' => 'Type' , 'event' => 'Event'),
+      '#description' => $this->t("The Events you want to send to the endpoint."),
+      '#options' => [
+        'entity:create' => ['type' => 'Entity' , 'event' => 'Create'],
+        'entity:update' => ['type' => 'Entity' , 'event' => 'Update'],
+        'entity:delete' => ['type' => 'Entity' , 'event' => 'Delete'],
+      ],
+      '#default_value' => $webhook->getEvents(),
+    );
     return $form;
   }
 
