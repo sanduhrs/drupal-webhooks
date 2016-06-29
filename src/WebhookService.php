@@ -1,7 +1,7 @@
 <?php
 
 namespace Drupal\webhooks;
-use Drupal\Core\Entity\EntityInterface;
+use GuzzleHttp\Client;
 
 
 /**
@@ -14,7 +14,7 @@ class WebhookService implements WebhookServiceInterface {
   /**
    * Constructor.
    */
-  public function __construct() {
+  public function __construct(Client $client) {
 
   }
 }

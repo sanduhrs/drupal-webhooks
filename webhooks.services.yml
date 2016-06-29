@@ -1,4 +1,4 @@
 services:
-  webhooks.events:
+  webhooks.service:
     class: Drupal\webhooks\WebhookService
-    arguments: []
+    arguments: ['@http_client']
