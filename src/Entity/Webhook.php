@@ -89,11 +89,11 @@ class Webhook extends ConfigEntityBase implements WebhookInterface {
   protected $last_usage;
 
   /**
-   * The Webhook result.
+   * The Webhook response_ok.
    *
    * @var boolean
    */
-  protected $result;
+  protected $response_ok;
 
   /**
    * The Webhook reference entity type.

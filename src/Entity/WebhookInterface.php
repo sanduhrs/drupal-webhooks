@@ -48,7 +48,7 @@ interface WebhookInterface extends ConfigEntityInterface {
   /**
    * @return boolean
    */
-  public function isResult();
+  public function hasResponseOk();
 
   /**
    * @return string

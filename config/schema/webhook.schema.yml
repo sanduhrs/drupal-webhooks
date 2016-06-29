@@ -23,9 +23,9 @@ webhooks.webhook.*:
     events:
       type: string
       label: 'Events'
-    result:
+    response_ok:
       type: boolean
-      label: 'Result'
+      label: 'Response OK'
     ref_entity_type:
       type: string
       label: 'Reference Entity Type'
