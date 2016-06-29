@@ -50,13 +50,13 @@ class WebhookForm extends EntityForm {
     );
 
     $form['secret'] = array(
-      '#type' => 'password_confirm',
+      '#type' => 'textfield',
       '#attributes' => array(
-        'placeholder' => $this->t('My placeholder text'),
+        'placeholder' => $this->t('Secret'),
       ),
       '#title' => $this->t('Secret'),
       '#maxlength' => 255,
-      '#description' => $this->t("Password to scramble your webhook."),
+      '#description' => $this->t("Secret that the target website gave you."),
       '#required' => TRUE,
     );
 
