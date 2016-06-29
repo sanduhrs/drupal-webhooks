@@ -18,6 +18,7 @@ class WebhookForm extends EntityForm {
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
 
+    /** @var \Drupal\webhooks\Entity\Webhook $webhook */
     $webhook = $this->entity;
     $form['label'] = array(
       '#type' => 'textfield',
@@ -37,13 +38,13 @@ class WebhookForm extends EntityForm {
       '#disabled' => !$webhook->isNew(),
     );
 
-    /* You will need additional form elements for your custom properties. */
     $form['payload_url']= array(
       '#type' => 'textfield',
       '#title' => $this->t('Payload URL'),
       '#attributes' => array(
         'placeholder' => $this->t('http://example.com/post'),
       ),
+      '#default_value' => $webhook->getPayloadUrl(),
       '#maxlength' => 255,
       '#description' => $this->t("Target URL for your payload."),
       '#required' => TRUE,
