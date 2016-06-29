@@ -109,7 +109,14 @@ class WebhookForm extends EntityForm {
     /** @var \Drupal\webhooks\Entity\Webhook $webhook */
     $webhook = $this->entity;
 
-    $webhook->set('events', serialize($webhook->getEvents()));
+    // Keep the old secret if no new one has been given.
+    if (empty($form_state['values']['secret'])) {
+      $webhook->set('secret', $webhook->getSecret());
+    }
+
+    // Serialize the events array before saving.
+    $webhook->set('events', serialize($form_state['values']['events']));
+
     $active = $webhook->save();
 
     switch ($active) {
