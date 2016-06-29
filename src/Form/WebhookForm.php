@@ -58,7 +58,6 @@ class WebhookForm extends EntityForm {
       '#title' => $this->t('Secret'),
       '#maxlength' => 255,
       '#description' => $this->t("Secret that the target website gave you."),
-      '#required' => TRUE,
     );
 
     $form['status'] = array(
@@ -74,6 +73,7 @@ class WebhookForm extends EntityForm {
       '#options' => [
         '1' => $this->t('application/json'),
         '2' => $this->t('application/xml'),
+        '3' => $this->t('application/x-www-form-urlencoded'),
       ],
     );
     return $form;
