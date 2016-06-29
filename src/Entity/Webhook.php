@@ -75,11 +75,11 @@ class Webhook extends ConfigEntityBase implements WebhookInterface {
   protected $content_type;
 
   /**
-   * The Webhook status.
+   * The Webhook active.
    *
    * @var boolean
    */
-  protected $status;
+  protected $active;
 
   /**
    * The Webhook last usage.
@@ -89,11 +89,11 @@ class Webhook extends ConfigEntityBase implements WebhookInterface {
   protected $last_usage;
 
   /**
-   * The Webhook result.
+   * The Webhook response_ok.
    *
    * @var boolean
    */
-  protected $result;
+  protected $response_ok;
 
   /**
    * The Webhook reference entity type.
@@ -154,8 +154,8 @@ class Webhook extends ConfigEntityBase implements WebhookInterface {
   /**
    * @return boolean
    */
-  public function isStatus() {
-    return $this->status;
+  public function isActive() {
+    return $this->active;
   }
 
   /**
@@ -168,14 +168,14 @@ class Webhook extends ConfigEntityBase implements WebhookInterface {
   /**
    * @return boolean
    */
-  public function isResult() {
-    return $this->result;
+  public function hasResponseOk() {
+    return $this->response_ok;
   }
 
   /**
    * @return string
    */
-  public function getrefEntityType() {
+  public function getRefEntityType() {
     return $this->ref_entity_type;
   }
 

@@ -60,7 +60,7 @@ class WebhookForm extends EntityForm {
       '#description' => $this->t("Secret that the target website gave you."),
     );
 
-    $form['status'] = array(
+    $form['active'] = array(
       '#type' => 'checkbox',
       '#title' => $this->t("Active"),
       '#description' => $this->t("Shows if the webhook is active or not."),
@@ -86,9 +86,9 @@ class WebhookForm extends EntityForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $webhook = $this->entity;
-    $status = $webhook->save();
+    $active = $webhook->save();
 
-    switch ($status) {
+    switch ($active) {
       case SAVED_NEW:
         drupal_set_message($this->t('Created the %label Webhook.', [
           '%label' => $webhook->label(),

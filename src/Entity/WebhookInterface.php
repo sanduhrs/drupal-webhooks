@@ -38,7 +38,7 @@ interface WebhookInterface extends ConfigEntityInterface {
   /**
    * @return boolean
    */
-  public function isStatus();
+  public function isActive();
 
   /**
    * @return int
@@ -48,12 +48,12 @@ interface WebhookInterface extends ConfigEntityInterface {
   /**
    * @return boolean
    */
-  public function isResult();
+  public function hasResponseOk();
 
   /**
    * @return string
    */
-  public function getrefEntityType();
+  public function getRefEntityType();
 
   /**
    * @return string
