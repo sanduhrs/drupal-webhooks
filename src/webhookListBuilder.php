@@ -27,7 +27,6 @@ class webhookListBuilder extends ConfigEntityListBuilder {
 
     $row['label'] = $entity->label();
     $row['id'] = $entity->id();
-    // You probably want a few more properties here...
     return $row + parent::buildRow($entity);
   }
 
