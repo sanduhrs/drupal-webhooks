@@ -51,13 +51,14 @@ class WebhookForm extends EntityForm {
     );
 
     $form['secret'] = array(
-      '#type' => 'textfield',
+      '#type' => 'password',
       '#attributes' => array(
         'placeholder' => $this->t('Secret'),
       ),
       '#title' => $this->t('Secret'),
       '#maxlength' => 255,
       '#description' => $this->t("Secret that the target website gave you."),
+      '#default_value' => $webhook->getSecret(),
     );
 
     $form['active'] = array(
@@ -110,12 +111,12 @@ class WebhookForm extends EntityForm {
     $webhook = $this->entity;
 
     // Keep the old secret if no new one has been given.
-    if (empty($form_state['values']['secret'])) {
-      $webhook->set('secret', $webhook->getSecret());
+    if (empty($form_state->getValue('secret'))) {
+      $webhook->set($form['secret']['#default_value']);
     }
 
     // Serialize the events array before saving.
-    $webhook->set('events', serialize($form_state['values']['events']));
+    $webhook->set('events', serialize($form_state->getValue('events')));
 
     $active = $webhook->save();
 
