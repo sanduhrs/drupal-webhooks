@@ -11,14 +11,14 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *   id = "webhook",
  *   label = @Translation("Webhook"),
  *   handlers = {
- *     "list_builder" = "Drupal\webhooks\webhookListBuilder",
+ *     "list_builder" = "Drupal\webhooks\WebhookListBuilder",
  *     "form" = {
- *       "add" = "Drupal\webhooks\Form\webhookForm",
- *       "edit" = "Drupal\webhooks\Form\webhookForm",
- *       "delete" = "Drupal\webhooks\Form\webhookDeleteForm"
+ *       "add" = "Drupal\webhooks\Form\WebhookForm",
+ *       "edit" = "Drupal\webhooks\Form\WebhookForm",
+ *       "delete" = "Drupal\webhooks\Form\WebhookDeleteForm"
  *     },
  *     "route_provider" = {
- *       "html" = "Drupal\webhooks\webhookHtmlRouteProvider",
+ *       "html" = "Drupal\webhooks\WebhookHtmlRouteProvider",
  *     },
  *   },
  *   config_prefix = "webhook",
