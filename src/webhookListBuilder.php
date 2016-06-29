@@ -45,7 +45,6 @@ class webhookListBuilder extends ConfigEntityListBuilder {
     $row['entity_id'] = $webhook->getEntityId();
     $row['secret'] = $webhook->getSecret();
     $row['content_type'] = $webhook->getContentType();
-    // You probably want a few more properties here...
     return $row + parent::buildRow($entity);
   }
 
