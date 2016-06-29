@@ -81,12 +81,21 @@ class WebhookForm extends EntityForm {
 
     $form['events'] = array(
       '#type' => 'tableselect',
-      '#header' => array('type' => 'Type' , 'event' => 'Event'),
+      '#header' => array('type' => 'Entity Type' , 'event' => 'Event'),
       '#description' => $this->t("The Events you want to send to the endpoint."),
       '#options' => [
-        'entity:create' => ['type' => 'Entity' , 'event' => 'Create'],
-        'entity:update' => ['type' => 'Entity' , 'event' => 'Update'],
-        'entity:delete' => ['type' => 'Entity' , 'event' => 'Delete'],
+        'entity:create' => ['type' => 'Any' , 'event' => 'Create'],
+        'entity:update' => ['type' => 'Any' , 'event' => 'Update'],
+        'entity:delete' => ['type' => 'Any' , 'event' => 'Delete'],
+        'entity:user:create' => ['type' => 'User' , 'event' => 'Create'],
+        'entity:user:update' => ['type' => 'User' , 'event' => 'Update'],
+        'entity:user:delete' => ['type' => 'User' , 'event' => 'Delete'],
+        'entity:node:create' => ['type' => 'Node' , 'event' => 'Create'],
+        'entity:node:update' => ['type' => 'Node' , 'event' => 'Update'],
+        'entity:node:delete' => ['type' => 'Node' , 'event' => 'Delete'],
+        'entity:comment:create' => ['type' => 'Comment' , 'event' => 'Create'],
+        'entity:comment:update' => ['type' => 'Comment' , 'event' => 'Update'],
+        'entity:comment:delete' => ['type' => 'Comment' , 'event' => 'Delete'],
       ],
       '#default_value' => $webhook->getEvents(),
     );
