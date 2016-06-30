@@ -6,16 +6,16 @@ namespace Drupal\webhooks\Event;
 use Drupal\webhooks\WebhookService;
 use Symfony\Component\EventDispatcher\Event;
 
-class WebhookCrudEvent extends Event {
+class WebhookSend extends Event {
 
-  protected $webhook;
+  protected $send;
 
   public function __construct(WebhookService $webhook) {
-    $this->webhook = $webhook;
+    $this->send = $webhook;
   }
 
   public function getWebhook() {
-    return $this->webhook;
+    return $this->send;
   }
 
 

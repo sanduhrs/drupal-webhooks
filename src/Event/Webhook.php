@@ -3,7 +3,7 @@
 namespace Drupal\webhooks\Event;
 
 
-final class WebhookEvents {
+final class Webhook {
   /**
    * Name of the event fired when a webhook is sent.
    */
