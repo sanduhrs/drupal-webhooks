@@ -1,8 +1,10 @@
 <?php
 
 namespace Drupal\webhooks;
+use Drupal\webhooks\Event\WebhookCrudEvent;
+use Drupal\webhooks\Event\WebhookEvents;
 use GuzzleHttp\Client;
-use Drupal\webhooks\Payload;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * Class WebhookService.
@@ -16,11 +18,15 @@ class WebhookService implements WebhookServiceInterface {
    */
   protected $client;
 
+  /** @var  \Symfony\Component\EventDispatcher */
+  protected $eventDispatcher;
+
   /**
    * Constructor.
    */
-  public function __construct(Client $client) {
+  public function __construct(Client $client, EventDispatcher $eventDispatcher) {
     $this->client = $client;
+    $this->eventDispatcher = $eventDispatcher;
   }
 
   /**
@@ -28,6 +34,8 @@ class WebhookService implements WebhookServiceInterface {
    * @param \Drupal\webhooks\Payload $payload
    */
   public function send(Webhook $webhook, Payload $payload) {
+    $event = new WebhookCrudEvent($this);
+    $this->eventDispatcher->dispatch(WebhookEvents::SEND, $event);
 
   }
 
