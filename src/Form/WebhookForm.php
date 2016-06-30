@@ -98,8 +98,11 @@ class WebhookForm extends EntityForm {
         'entity:comment:update' => ['type' => 'Comment' , 'event' => 'Update'],
         'entity:comment:delete' => ['type' => 'Comment' , 'event' => 'Delete'],
       ],
-      '#default_value' => $webhook->getEvents(),
     );
+    // Check if the entity is not new, cause we get a warning otherwise.
+    if (!$webhook->isNew()) {
+      $form['events']['#default_value'] = $webhook->getEvents();
+    }
     return $form;
   }
 
@@ -112,7 +115,7 @@ class WebhookForm extends EntityForm {
 
     // Keep the old secret if no new one has been given.
     if (empty($form_state->getValue('secret'))) {
-      $webhook->set($form['secret']['#default_value']);
+      $webhook->set('secret', $form['secret']['#default_value']);
     }
 
     // Serialize the events array before saving.

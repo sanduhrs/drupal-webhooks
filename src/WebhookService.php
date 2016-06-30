@@ -36,7 +36,6 @@ class WebhookService implements WebhookServiceInterface {
   public function send(Webhook $webhook, Payload $payload) {
     $event = new WebhookCrudEvent($this);
     $this->eventDispatcher->dispatch(WebhookEvents::SEND, $event);
-
   }
 
   public function receive() {
