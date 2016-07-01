@@ -1,8 +1,10 @@
 <?php
 
 namespace Drupal\webhooks;
-use Drupal\webhooks\Event\WebhookCrudEvent;
-use Drupal\webhooks\Event\WebhookEvents;
+use Drupal\comment\Entity\Comment;
+use Drupal\node\Entity\Node;
+use Drupal\user\Entity\User;
+use Drupal\webhooks\Entity\Webhook;
 use GuzzleHttp\Client;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -34,11 +36,27 @@ class WebhookService implements WebhookServiceInterface {
    * @param \Drupal\webhooks\Payload $payload
    */
   public function send(Webhook $webhook, Payload $payload) {
-    $event = new WebhookCrudEvent($this);
-    $this->eventDispatcher->dispatch(WebhookEvents::SEND, $event);
+    switch ($webhook->getEntityType()) {
+      case 'user':
+        $payload->setPayload(User::load($webhook->id()));
+        break;
+      case 'node':
+        $payload->setPayload(Node::load($webhook->id()));
+        break;
+      case 'comment':
+        $payload->setPayload(Comment::load($webhook->id()));
+        break;
+    }
+    $this->client->post($webhook->getPayloadUrl(),$payload->getPayload());
   }
 
   public function receive() {
-
+    $_POST[''];
   }
+  /*// Send
+$event = new WebhookSend($this);
+$this->eventDispatcher->dispatch(WebhookEvents::SEND, $event);
+  // Receive
+$event = new WebhookReceive($this);
+$this->eventDispatcher->dispatch(WebhookEvents::RECEIVE, $event);*/
 }
