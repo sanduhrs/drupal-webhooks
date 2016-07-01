@@ -85,9 +85,6 @@ class WebhookForm extends EntityForm {
       '#header' => array('type' => 'Entity Type' , 'event' => 'Event'),
       '#description' => $this->t("The Events you want to send to the endpoint."),
       '#options' => [
-        'entity:create' => ['type' => 'Any' , 'event' => 'Create'],
-        'entity:update' => ['type' => 'Any' , 'event' => 'Update'],
-        'entity:delete' => ['type' => 'Any' , 'event' => 'Delete'],
         'entity:user:create' => ['type' => 'User' , 'event' => 'Create'],
         'entity:user:update' => ['type' => 'User' , 'event' => 'Update'],
         'entity:user:delete' => ['type' => 'User' , 'event' => 'Delete'],
