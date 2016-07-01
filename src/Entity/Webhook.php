@@ -29,11 +29,11 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "uuid" = "uuid"
  *   },
  *   links = {
- *     "canonical" = "/admin/structure/webhook/{webhook}",
- *     "add-form" = "/admin/structure/webhook/add",
- *     "edit-form" = "/admin/structure/webhook/{webhook}/edit",
- *     "delete-form" = "/admin/structure/webhook/{webhook}/delete",
- *     "collection" = "/admin/structure/webhook"
+ *     "canonical" = "/admin/config/services/webhook/{webhook}",
+ *     "add-form" = "/admin/config/services/webhook/add",
+ *     "edit-form" = "/admin/config/services/webhook/{webhook}/edit",
+ *     "delete-form" = "/admin/config/services/webhook/{webhook}/delete",
+ *     "collection" = "/admin/config/services/webhook"
  *   }
  * )
  */
