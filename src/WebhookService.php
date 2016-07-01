@@ -1,9 +1,6 @@
 <?php
 
 namespace Drupal\webhooks;
-use Drupal\comment\Entity\Comment;
-use Drupal\node\Entity\Node;
-use Drupal\user\Entity\User;
 use Drupal\webhooks\Entity\Webhook;
 use GuzzleHttp\Client;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -16,19 +13,15 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 class WebhookService implements WebhookServiceInterface {
 
   /**
-   * @var \GuzzleHttp\Client
+   * @var \Drupal::httpClient()
    */
   protected $client;
-
-  /** @var  \Symfony\Component\EventDispatcher */
-  protected $eventDispatcher;
 
   /**
    * Constructor.
    */
-  public function __construct(Client $client, EventDispatcher $eventDispatcher) {
-    $this->client = $client;
-    $this->eventDispatcher = $eventDispatcher;
+  public function __construct() {
+    $this->client = \Drupal::httpClient();
   }
 
   /**
@@ -48,7 +41,7 @@ class WebhookService implements WebhookServiceInterface {
           xmlrpc_decode();
         break;
       case 'x-www-form-urlencoded':
-          urlencode();
+          urldecode();
         break;
 
       default :
