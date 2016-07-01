@@ -32,7 +32,7 @@ function webhooks_help($route_name, RouteMatchInterface $route_match) {
  */
 function webhooks_entity_create(EntityInterface $entity) {
   $prepayload = NULL;
-  $payload = new Payload();
+  $payload = new Payload($prepayload);
   $service = new WebhookService();
 
   switch ($service->getContentType()) {
