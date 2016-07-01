@@ -5,9 +5,9 @@
  * Contains webhooks.module..
  */
 
+use Drupal\Core\Entity\Entity;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\webhooks\Entity\Webhook;
 use Drupal\webhooks\Payload;
 use Drupal\webhooks\WebhookService;
 
@@ -34,8 +34,6 @@ function webhooks_entity_create(EntityInterface $entity) {
   $prepayload = NULL;
   $payload = new Payload();
   $service = new WebhookService();
-  $webhooks = $payload->getBundleInfo('webhook');
-  dpm($webhooks);
 
   switch ($service->getContentType()) {
     case 'application/json':
@@ -70,7 +68,3 @@ function webhooks_entity_delete(EntityInterface $entity) {
 
 }
 
-function webhooks_happy_helper(EntityTypeBundleInfo $entity_type) {
-  $bundleinfo = $entity_type->getBundleInfo('webhook');
-  return $bundleinfo;
-}
