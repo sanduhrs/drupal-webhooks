@@ -36,27 +36,25 @@ class WebhookService implements WebhookServiceInterface {
    * @param \Drupal\webhooks\Payload $payload
    */
   public function send(Webhook $webhook, Payload $payload) {
-    switch ($webhook->getEntityType()) {
-      case 'user':
-        $payload->setPayload(User::load($webhook->id()));
-        break;
-      case 'node':
-        $payload->setPayload(Node::load($webhook->id()));
-        break;
-      case 'comment':
-        $payload->setPayload(Comment::load($webhook->id()));
-        break;
-    }
     $this->client->post($webhook->getPayloadUrl(),$payload->getPayload());
   }
 
   public function receive() {
-    $_POST[''];
+    switch($_SERVER['CONTENT_TYPE']) {
+      case 'application/json':
+          \GuzzleHttp\json_decode();
+        break;
+      case 'application/xml':
+          xmlrpc_decode();
+        break;
+      case 'x-www-form-urlencoded':
+          urlencode();
+        break;
+
+      default :
+        _drupal_log_error('None supported CONTENT_TYPE (json, xml , x-www-form');
+        break;
+    }
   }
-  /*// Send
-$event = new WebhookSend($this);
-$this->eventDispatcher->dispatch(WebhookEvents::SEND, $event);
-  // Receive
-$event = new WebhookReceive($this);
-$this->eventDispatcher->dispatch(WebhookEvents::RECEIVE, $event);*/
+
 }
