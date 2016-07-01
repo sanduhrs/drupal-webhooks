@@ -1,16 +1,16 @@
 <?php
 
 namespace Drupal\webhooks;
+
 use Drupal\webhooks\Entity\Webhook;
-use GuzzleHttp\Client;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Drupal\webhooks\Entity\WebhookInterface;
 
 /**
  * Class WebhookService.
  *
  * @package Drupal\webhooks
  */
-class WebhookService implements WebhookServiceInterface {
+class WebhookService extends Webhook implements WebhookServiceInterface {
 
   /**
    * @var \Drupal::httpClient()
@@ -28,8 +28,8 @@ class WebhookService implements WebhookServiceInterface {
    * @param \Drupal\webhooks\Webhook $webhook
    * @param \Drupal\webhooks\Payload $payload
    */
-  public function send(Webhook $webhook, Payload $payload) {
-    $this->client->post($webhook->getPayloadUrl(),$payload->getPayload());
+  public function send(Payload $payload) {
+    $this->client->post($this->getPayloadUrl(),$payload->getPayload());
   }
 
   public function receive() {
@@ -45,7 +45,7 @@ class WebhookService implements WebhookServiceInterface {
         break;
 
       default :
-        _drupal_log_error('None supported CONTENT_TYPE (json, xml , x-www-form');
+        \Drupal::logger('webhooks')->error('None supported CONTENT_TYPE was recognized.');
         break;
     }
   }

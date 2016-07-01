@@ -30,12 +30,16 @@ function webhooks_help($route_name, RouteMatchInterface $route_match) {
 /**
  * Implements hook_entity_create().
  */
-function webhooks_entity_create(EntityInterface $entity, Webhook $webhook, WebhookService $service, Payload $payload) {
+function webhooks_entity_create(EntityInterface $entity) {
   $prepayload = NULL;
+  $payload = new Payload();
+  $service = new WebhookService();
+  $webhooks = $payload->getBundleInfo('webhook');
+  dpm($webhooks);
 
-  switch ($webhook->getContentType()) {
+  switch ($service->getContentType()) {
     case 'application/json':
-      $prepayload = \GuzzleHttp\json_encode(R::exportAll($entity));
+      $prepayload = \GuzzleHttp\json_encode($entity);
       break;
     case 'application/xml':
       $prepayload = xmlrpc_encode($entity);
@@ -47,25 +51,9 @@ function webhooks_entity_create(EntityInterface $entity, Webhook $webhook, Webho
     default:
       break;
   }
+  $payload->setPayload($prepayload);
 
-  switch ($entity->getEntityType()) {
-    case 'user':
-      $payload->setPayload($prepayload);
-      $service->send($webhook, $payload);
-      break;
-    case 'node':
-      $payload->setPayload($prepayload);
-      $service->send($webhook, $payload);
-      break;
-    case 'comment':
-      $payload->setPayload($prepayload);
-      $service->send($webhook, $payload);
-      break;
-
-    default :
-      _drupal_log_error('None supported entity_type was recognized.');
-      break;
-  }
+  //$service->send($payload);
 }
 
 /**
@@ -80,4 +68,9 @@ function webhooks_entity_update(EntityInterface $entity) {
  */
 function webhooks_entity_delete(EntityInterface $entity) {
 
+}
+
+function webhooks_happy_helper(EntityTypeBundleInfo $entity_type) {
+  $bundleinfo = $entity_type->getBundleInfo('webhook');
+  return $bundleinfo;
 }
