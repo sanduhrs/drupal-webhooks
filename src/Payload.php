@@ -13,7 +13,7 @@ class Payload {
    *
    * @param array $payload
    */
-  public function __construct(array $payload) {
+  public function __construct($payload) {
     $this->payload = $payload;
   }
 
