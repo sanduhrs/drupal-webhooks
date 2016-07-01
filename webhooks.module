@@ -7,6 +7,9 @@
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\webhooks\Entity\Webhook;
+use Drupal\webhooks\Payload;
+use Drupal\webhooks\WebhookService;
 
 /**
  * Implements hook_help().
@@ -27,8 +30,42 @@ function webhooks_help($route_name, RouteMatchInterface $route_match) {
 /**
  * Implements hook_entity_create().
  */
-function webhooks_entity_create(EntityInterface $entity) {
+function webhooks_entity_create(EntityInterface $entity, Webhook $webhook, WebhookService $service, Payload $payload) {
+  $prepayload = NULL;
 
+  switch ($webhook->getContentType()) {
+    case 'application/json':
+      $prepayload = \GuzzleHttp\json_encode(R::exportAll($entity));
+      break;
+    case 'application/xml':
+      $prepayload = xmlrpc_encode($entity);
+      break;
+    case 'application/x-www-form-urlencoded':
+      $prepayload = urlencode($entity);
+      break;
+
+    default:
+      break;
+  }
+
+  switch ($entity->getEntityType()) {
+    case 'user':
+      $payload->setPayload($prepayload);
+      $service->send($webhook, $payload);
+      break;
+    case 'node':
+      $payload->setPayload($prepayload);
+      $service->send($webhook, $payload);
+      break;
+    case 'comment':
+      $payload->setPayload($prepayload);
+      $service->send($webhook, $payload);
+      break;
+
+    default :
+      _drupal_log_error('None supported entity_type was recognized.');
+      break;
+  }
 }
 
 /**
