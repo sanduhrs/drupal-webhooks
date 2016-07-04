@@ -10,8 +10,8 @@ class WebhookReceive extends Event {
 
   protected $receive;
 
-  public function __construct(WebhookService $webhook) {
-    $this->receive = $webhook;
+  public function __construct($receive) {
+    $this->receive = $receive;
   }
 
   public function getWebhook() {

@@ -10,8 +10,8 @@ class WebhookSend extends Event {
 
   protected $send;
 
-  public function __construct(WebhookService $webhook) {
-    $this->send = $webhook;
+  public function __construct($send) {
+    $this->send = $send;
   }
 
   public function getWebhook() {
