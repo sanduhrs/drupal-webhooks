@@ -31,6 +31,9 @@ class Payload {
     $this->payload = $payload;
   }
 
+  /**
+   * @param $payload_element
+   */
   public function addToPayload($payload_element) {
     array_push($this->payload, $payload_element);
   }
