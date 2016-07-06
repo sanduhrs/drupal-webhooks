@@ -74,8 +74,7 @@ class WebhookForm extends EntityForm {
       '#description' => $this->t("The Content Type of your webhook."),
       '#options' => [
         'json' => $this->t('application/json'),
-        'xml' => $this->t('application/xml'),
-        'form' => $this->t('application/x-www-form-urlencoded'),
+        'xml' => $this->t('application/xml')
       ],
       '#default_value' => $webhook->getContentType(),
     );
