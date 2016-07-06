@@ -1,7 +1,7 @@
 services:
   webhooks.service:
     class: Drupal\webhooks\WebhookService
-    arguments: ['@http_client']
+    arguments: ['@http_client', '@logger.factory']
   webhooks.base:
     class: Drupal\webhooks\Entity\Webhook
   webhooks.payload:
