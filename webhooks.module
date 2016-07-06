@@ -28,30 +28,28 @@ function webhooks_help($route_name, RouteMatchInterface $route_match) {
 }
 
 /**
- * Implements hook_entity_create().
+ * Implements hook_entity_insert().
  */
-function webhooks_entity_create(EntityInterface $entity) {
-  $prepayload = NULL;
-  $payload = new Payload($prepayload);
-  $service = new WebhookService();
+function webhooks_entity_insert(EntityInterface $entity) {
+  $query = \Drupal::entityQuery('webhook')
+    ->condition('active', 1)
+    ->condition('events', 'entity:' . $entity->getEntityType()->id() . ':create', 'CONTAINS');
+  $ids = $query->execute();
 
-  switch ($service->getContentType()) {
-    case 'application/json':
-      $prepayload = \GuzzleHttp\json_encode($entity);
-      break;
-    case 'application/xml':
-      $prepayload = xmlrpc_encode($entity);
-      break;
-    case 'application/x-www-form-urlencoded':
-      $prepayload = urlencode($entity);
-      break;
+  /** @var \Drupal\Core\Entity\EntityStorageInterface $webhooks_storage */
+  $webhooks_storage = \Drupal::entityTypeManager()->getStorage('webhook');
+  $webhooks = $webhooks_storage->loadMultiple($ids);
 
-    default:
-      break;
+  $payload = new Payload([
+    'entity' => $entity->toArray(),
+  ]);
+
+  /** @var \Drupal\webhooks\WebhookService $webhookService */
+  $webhookService = \Drupal::service('webhooks.service');
+  $webhooks = entity_load_multiple('webhook', $ids);
+  foreach ($webhooks as $webhook) {
+    $webhookService->send($webhook, $payload);
   }
-  $payload->setPayload($prepayload);
-
-  //$service->send($payload);
 }
 
 /**
