@@ -6,7 +6,7 @@ namespace Drupal\webhooks\Event;
 use Drupal\webhooks\WebhookService;
 use Symfony\Component\EventDispatcher\Event;
 
-class WebhookSend extends Event {
+class Send extends Event {
 
   protected $send;
 
