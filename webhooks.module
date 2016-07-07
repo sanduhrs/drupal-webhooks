@@ -19,7 +19,7 @@ function webhooks_help($route_name, RouteMatchInterface $route_match) {
     // Main module help for the webhooks module.
     case 'help.page.webhooks':
       $output = '';
-      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<h3>' . t('Webhooks') . '</h3>';
       $output .= '<p>' . t('My Awesome Module') . '</p>';
       return $output;
 
@@ -31,13 +31,13 @@ function webhooks_help($route_name, RouteMatchInterface $route_match) {
  * Implements hook_entity_insert().
  */
 function webhooks_entity_insert(EntityInterface $entity) {
-  $query = \Drupal::entityQuery('webhook')
+  $query = \Drupal::entityQuery('webhook_config')
     ->condition('active', 1)
     ->condition('events', 'entity:' . $entity->getEntityType()->id() . ':create', 'CONTAINS');
   $ids = $query->execute();
 
   /** @var \Drupal\Core\Entity\EntityStorageInterface $webhooks_storage */
-  $webhooks_storage = \Drupal::entityTypeManager()->getStorage('webhook');
+  $webhooks_storage = \Drupal::entityTypeManager()->getStorage('webhook_config');
   $webhooks = $webhooks_storage->loadMultiple($ids);
 
   $payload = new Payload([
@@ -46,7 +46,7 @@ function webhooks_entity_insert(EntityInterface $entity) {
 
   /** @var \Drupal\webhooks\WebhookService $webhookService */
   $webhookService = \Drupal::service('webhooks.service');
-  $webhooks = entity_load_multiple('webhook', $ids);
+  $webhooks = entity_load_multiple('webhook_config', $ids);
   foreach ($webhooks as $webhook) {
     $webhookService->send($webhook, $payload);
   }
@@ -56,13 +56,48 @@ function webhooks_entity_insert(EntityInterface $entity) {
  * Implements hook_entity_update().
  */
 function webhooks_entity_update(EntityInterface $entity) {
+  $query = \Drupal::entityQuery('webhook_config')
+    ->condition('active', 1)
+    ->condition('events', 'entity:' . $entity->getEntityType()->id() . ':update', 'CONTAINS');
+  $ids = $query->execute();
 
+  /** @var \Drupal\Core\Entity\EntityStorageInterface $webhooks_storage */
+  $webhooks_storage = \Drupal::entityTypeManager()->getStorage('webhook_config');
+  $webhooks = $webhooks_storage->loadMultiple($ids);
+
+  $payload = new Payload([
+    'entity' => $entity->toArray(),
+  ]);
+
+  /** @var \Drupal\webhooks\WebhookService $webhookService */
+  $webhookService = \Drupal::service('webhooks.service');
+  $webhooks = entity_load_multiple('webhook_config', $ids);
+  foreach ($webhooks as $webhook) {
+    $webhookService->send($webhook, $payload);
+  }
 }
 
 /**
  * Implements hook_entity_delete().
  */
 function webhooks_entity_delete(EntityInterface $entity) {
+  $query = \Drupal::entityQuery('webhook_config')
+    ->condition('active', 1)
+    ->condition('events', 'entity:' . $entity->getEntityType()->id() . ':delete', 'CONTAINS');
+  $ids = $query->execute();
 
+  /** @var \Drupal\Core\Entity\EntityStorageInterface $webhooks_storage */
+  $webhooks_storage = \Drupal::entityTypeManager()->getStorage('webhook_config');
+  $webhooks = $webhooks_storage->loadMultiple($ids);
+
+  $payload = new Payload([
+    'entity' => $entity->toArray(),
+  ]);
+
+  /** @var \Drupal\webhooks\WebhookService $webhookService */
+  $webhookService = \Drupal::service('webhooks.service');
+  foreach ($webhooks as $webhook) {
+    $webhookService->send($webhook, $payload);
+  }
 }
 
