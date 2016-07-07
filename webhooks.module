@@ -46,7 +46,6 @@ function webhooks_entity_insert(EntityInterface $entity) {
 
   /** @var \Drupal\webhooks\WebhookService $webhookService */
   $webhookService = \Drupal::service('webhooks.service');
-  $webhooks = entity_load_multiple('webhook_config', $ids);
   foreach ($webhooks as $webhook) {
     $webhookService->send($webhook, $payload);
   }
