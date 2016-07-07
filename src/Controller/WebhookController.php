@@ -3,13 +3,9 @@
 namespace Drupal\webhooks\Controller;
 
 use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Access\AccessResultAllowed;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\webhooks\Event\WebhookEvents;
-use Drupal\webhooks\Event\ReceiveEvent;
 use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Psr7\ServerRequest;
 
 /**
  * Class Webhook.
@@ -21,21 +17,13 @@ class WebhookController extends ControllerBase {
   /**
    * Webhooks receiver.
    *
-   * @return string
-   *   Return Hello string.
+   * @return Response
+   *   Return 200 OK.
    */
   public function receive() {
     /** @var \Drupal\webhooks\WebhookService $webhookService */
     $webhookService = \Drupal::service('webhooks.service');
-    /** @var \Drupal\webhooks\Webhook $webhook */
-    $webhook = $webhookService->receive();
-
-    /** @var \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher $eventDispatcher */
-    $eventDispatcher = \Drupal::service('event_dispatcher');
-    $eventDispatcher->dispatch(
-      WebhookEvents::RECEIVE,
-      new ReceiveEvent($webhook)
-    );
+    $webhookService->receive();
     return new Response(200, [], 'OK');
   }
 
@@ -50,7 +38,7 @@ class WebhookController extends ControllerBase {
   }
 
   /**
-   * @param $id
+   * @param mixed $id
    *  The id of the entity given by route url.
    */
   public function toggleActive($id) {
