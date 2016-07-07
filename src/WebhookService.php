@@ -75,6 +75,14 @@ class WebhookService implements WebhookServiceInterface {
         ['@webhook' => $webhook->id(), '@message' => $e->getMessage()]
       );
     }
+
+    /** @var \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher $eventDispatcher */
+    $eventDispatcher = \Drupal::service('event_dispatcher');
+    $eventDispatcher->dispatch(
+      WebhookEvents::SEND,
+      $webhook,
+      $payload
+    );
   }
 
   /**
