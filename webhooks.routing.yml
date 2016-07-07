@@ -3,7 +3,7 @@ webhooks.webhook_receive:
   path: '/webhooks'
   methods: [POST]
   defaults:
-    _controller: '\Drupal\webhooks\Controller\Webhook::receive'
+    _controller: '\Drupal\webhooks\Controller\WebhookController::receive'
     _title: 'Webhooks receiver'
   requirements:
-    _custom_access: '\Drupal\webhooks\Controller\Webhook::access'
+    _custom_access: '\Drupal\webhooks\Controller\WebhookController::access'
