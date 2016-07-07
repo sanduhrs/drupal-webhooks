@@ -3,19 +3,22 @@
 namespace Drupal\webhooks;
 
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
-use Drupal\webhooks\Entity\Webhook;
+use Drupal\webhooks\Entity\Webhook as WebhookConfig;
 use Drupal\webhooks\Entity\WebhookInterface;
+use Drupal\webhooks\Webhook;
 use GuzzleHttp\Client;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class WebhookService.
  *
  * @package Drupal\webhooks
  */
-class WebhookService extends Webhook implements WebhookServiceInterface {
+class WebhookService implements WebhookServiceInterface {
 
   /**
-   * @var \Drupal::httpClient()
+   * @var \GuzzleHttp\Client
    */
   protected $client;
 
@@ -24,7 +27,9 @@ class WebhookService extends Webhook implements WebhookServiceInterface {
    */
   protected $loggerFactory;
 
+  protected $requestStack;
 
+  protected $webhook;
 
   /**
    * WebhookService constructor.
@@ -34,17 +39,20 @@ class WebhookService extends Webhook implements WebhookServiceInterface {
    */
   public function __construct(
       Client $client,
-      LoggerChannelFactoryInterface $logger_factory
+      LoggerChannelFactoryInterface $logger_factory,
+      RequestStack $request_stack
+
   ) {
     $this->client = $client;
     $this->loggerFactory = $logger_factory;
+    $this->requestStack = $request_stack;
   }
 
   /**
    * @param \Drupal\webhooks\Entity\Webhook $webhook
    * @param \Drupal\webhooks\Payload $payload
    */
-  public function send(Webhook $webhook, Payload $payload) {
+  public function send(WebhookConfig $webhook, Payload $payload) {
     $string = self::encode(
       $payload->getPayload(),
       $webhook->getContentType()
@@ -52,18 +60,43 @@ class WebhookService extends Webhook implements WebhookServiceInterface {
     try {
       $this->client->post(
         $webhook->getPayloadUrl(),
-        ['body' => $string]
+        [
+          'body' => $string,
+          'headers' => [
+            'Content-Type' => 'application/' . $webhook->getContentType(),
+            'X-Drupal-Webhooks-Event' => '',
+            'X-Drupal-Webhooks-Delivery' => '',
+          ],
+        ]
       );
     } catch (\Exception $e) {
-      // TODO: Fixme
-      $this->loggerFactory->get('webhooks')->error($e->getMessage());
+      $this->loggerFactory->get('webhooks')->error(
+        'Could not send Webhook @webhook: @message',
+        ['@webhook' => $webhook->id(), '@message' => $e->getMessage()]
+      );
     }
+  }
+
+  /**
+   * @return \Drupal\webhooks\Webhook
+   */
+  public function receive() {
+    $request = $this->requestStack->getCurrentRequest();
+    $headers = \GuzzleHttp\Psr7\parse_header($request->headers->all());
+    $payload = WebhookService::decode(
+      $request->getContent(),
+      $request->getContentType()
+    );
+    return new Webhook(
+      $headers,
+      $payload
+    );
   }
 
   /**
    * @param $data
    * @param $content_type
-   * @return bool|string|\Symfony\Component\Serializer\Encoder\scalar
+   * @return mixed
    */
   public static function encode($data, $content_type) {
     /** @var \Drupal\serialization\Encoder\JsonEncoder $encoder */
@@ -77,33 +110,14 @@ class WebhookService extends Webhook implements WebhookServiceInterface {
   /**
    * @param $data
    * @param $content_type
-   * @return bool|string|\Symfony\Component\Serializer\Encoder\scalar
+   * @return mixed
    */
   public static function decode($data, $content_type) {
     /** @var \Drupal\serialization\Encoder\JsonEncoder $encoder */
     $encoder = \Drupal::service('serializer.encoder.' . $content_type);
     if (!empty($encoder) && $encoder->supportsDecoding($content_type)) {
-      return $encoder->decode($data);
+      return $encoder->decode($data, $content_type);
     }
-    return false;
+    return '';
   }
-
-  public function receive() {
-    switch($_SERVER['CONTENT_TYPE']) {
-      case 'application/json':
-          \GuzzleHttp\json_decode();
-        break;
-      case 'application/xml':
-          xmlrpc_decode();
-        break;
-      case 'x-www-form-urlencoded':
-          urldecode();
-        break;
-      default :
-        $this->loggerFactory->get('webhooks')
-          ->error('Content-type not supported.');
-        break;
-    }
-  }
-
 }
