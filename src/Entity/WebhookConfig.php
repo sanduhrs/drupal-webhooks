@@ -170,6 +170,13 @@ class WebhookConfig extends ConfigEntityBase implements WebhookConfigInterface {
   }
 
   /**
+   * @param $state
+   */
+  public function setActive($state) {
+    $this->active = $state;
+  }
+
+  /**
    * @return int
    */
   public function getLastUsage() {

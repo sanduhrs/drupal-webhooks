@@ -49,4 +49,17 @@ class WebhookController extends ControllerBase {
     return AccessResult::allowed();
   }
 
+  /**
+   * @param $id
+   *  The id of the entity given by route url.
+   */
+  public function toggleActive($id) {
+    $webhooks_storage = \Drupal::entityTypeManager()->getStorage('webhook_config');
+    $webhook_config = $webhooks_storage->load($id);
+    $webhook_config->setActive(!$webhook_config->isActive());
+    $webhook_config->set('events', serialize($webhook_config->getEvents()));
+    $webhook_config->save();
+    return $this->redirect("entity.webhook_config.collection");
+  }
+
 }

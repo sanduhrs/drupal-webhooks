@@ -10,6 +10,18 @@ use Drupal\Core\Entity\EntityInterface;
  */
 class WebhookConfigListBuilder extends ConfigEntityListBuilder {
 
+  public function getOperations(EntityInterface $entity)
+  {
+    $operations = parent::getOperations($entity);
+    $operations['toggle_active'] = array(
+      'title' => $entity->isActive() ? t('Deactivate') : t('Activate'),
+      'weight' => 0,
+      'url' => \Drupal\Core\Url::fromRoute('webhooks.webhook_toggle_active', array('id' => $entity->id()))
+    );
+    uasort($operations, '\Drupal\Component\Utility\SortArray::sortByWeightElement');
+    return $operations;
+  }
+
   /**
    * {@inheritdoc}
    */
@@ -18,6 +30,18 @@ class WebhookConfigListBuilder extends ConfigEntityListBuilder {
     $header['label'] = $this->t('Webhook');
     $header['id'] = $this->t('Machine name');
     return $header + parent::buildHeader();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildOperations(EntityInterface $entity) {
+    $build = array(
+      '#type' => 'operations',
+      '#links' => $this->getOperations($entity),
+    );
+
+    return $build;
   }
 
   /**
