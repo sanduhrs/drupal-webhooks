@@ -1,6 +1,6 @@
-name: webhooks
+name: Webhooks
 type: module
-description: My Awesome Module
+description: "User-defined HTTP callbacks"
 core: 8.x
 package: Custom
 
