@@ -15,10 +15,10 @@ webhooks.webhook.*:
       type: boolean
       label: 'Active'
     payload_url:
-      type: string
+      type: uri
       label: 'Payload URL'
     last_usage:
-      type: integer
+      type: date_format
       label: 'Last usage of a Webhook'
     events:
       type: text
