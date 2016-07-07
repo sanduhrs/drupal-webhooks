@@ -3,7 +3,7 @@
 namespace Drupal\webhooks\Event;
 
 
-final class Webhook {
+final class WebhookEvents {
   /**
    * @Event
    *
