@@ -42,6 +42,15 @@ class Webhook {
   }
 
   /**
+   * @param array $headers
+   * @return Webhook
+   */
+  public function addHeaders($headers) {
+    array_push($this->headers, $headers);
+    return $this;
+  }
+
+  /**
    * @return array
    */
   public function getPayload() {
