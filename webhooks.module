@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains webhooks.module..
+ * Contains webhooks.module.
  */
 
 use Drupal\Core\Entity\Entity;
@@ -46,6 +46,7 @@ function webhooks_entity_insert(EntityInterface $entity) {
 
   /** @var \Drupal\webhooks\WebhookService $webhookService */
   $webhookService = \Drupal::service('webhooks.service');
+  /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook */
   foreach ($webhooks as $webhook) {
     $webhookService->send($webhook, $payload);
   }
@@ -70,7 +71,7 @@ function webhooks_entity_update(EntityInterface $entity) {
 
   /** @var \Drupal\webhooks\WebhookService $webhookService */
   $webhookService = \Drupal::service('webhooks.service');
-  $webhooks = entity_load_multiple('webhook_config', $ids);
+  /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook */
   foreach ($webhooks as $webhook) {
     $webhookService->send($webhook, $payload);
   }
@@ -95,6 +96,7 @@ function webhooks_entity_delete(EntityInterface $entity) {
 
   /** @var \Drupal\webhooks\WebhookService $webhookService */
   $webhookService = \Drupal::service('webhooks.service');
+  /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook */
   foreach ($webhooks as $webhook) {
     $webhookService->send($webhook, $payload);
   }
