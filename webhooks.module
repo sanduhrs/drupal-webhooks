@@ -10,6 +10,8 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\webhooks\Payload;
 use Drupal\webhooks\WebhookService;
+use Drupal\webhooks\Webhook;
+use Drupal\Component\Uuid\Php as Uuid;
 
 /**
  * Implements hook_help().
@@ -31,24 +33,33 @@ function webhooks_help($route_name, RouteMatchInterface $route_match) {
  * Implements hook_entity_insert().
  */
 function webhooks_entity_insert(EntityInterface $entity) {
+  $uuid = new Uuid();
+  $event = 'entity:' . $entity->getEntityType()->id() . ':create';
+
   $query = \Drupal::entityQuery('webhook_config')
     ->condition('active', 1)
-    ->condition('events', 'entity:' . $entity->getEntityType()->id() . ':create', 'CONTAINS');
+    ->condition('events', $event, 'CONTAINS');
   $ids = $query->execute();
 
   /** @var \Drupal\Core\Entity\EntityStorageInterface $webhooks_storage */
   $webhooks_storage = \Drupal::entityTypeManager()->getStorage('webhook_config');
-  $webhooks = $webhooks_storage->loadMultiple($ids);
-
-  $payload = new Payload([
-    'entity' => $entity->toArray(),
-  ]);
+  /** @var \Drupal\webhooks\Entity\WebhookConfig $webhookConfigs */
+  $webhook_configs = $webhooks_storage->loadMultiple($ids);
 
   /** @var \Drupal\webhooks\WebhookService $webhookService */
-  $webhookService = \Drupal::service('webhooks.service');
-  /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook */
-  foreach ($webhooks as $webhook) {
-    $webhookService->send($webhook, $payload);
+  $webhook_service = \Drupal::service('webhooks.service');
+  /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook_config */
+  foreach ($webhook_configs as $webhook_config) {
+    $webhook = new Webhook(
+      [
+        'Content-Type' => 'application/' . $webhook_config->getContentType(),
+        'X-Drupal-Webhooks-Event' => $event,
+        'X-Drupal-Webhooks-Delivery' => $uuid->generate(),
+      ],
+      ['entity' => $entity->toArray()]
+    );
+
+    $webhook_service->send($webhook_config, $webhook);
   }
 }
 
@@ -56,24 +67,33 @@ function webhooks_entity_insert(EntityInterface $entity) {
  * Implements hook_entity_update().
  */
 function webhooks_entity_update(EntityInterface $entity) {
+  $uuid = new Uuid();
+  $event = 'entity:' . $entity->getEntityType()->id() . ':update';
+
   $query = \Drupal::entityQuery('webhook_config')
     ->condition('active', 1)
-    ->condition('events', 'entity:' . $entity->getEntityType()->id() . ':update', 'CONTAINS');
+    ->condition('events', $event, 'CONTAINS');
   $ids = $query->execute();
 
   /** @var \Drupal\Core\Entity\EntityStorageInterface $webhooks_storage */
   $webhooks_storage = \Drupal::entityTypeManager()->getStorage('webhook_config');
-  $webhooks = $webhooks_storage->loadMultiple($ids);
-
-  $payload = new Payload([
-    'entity' => $entity->toArray(),
-  ]);
+  /** @var \Drupal\webhooks\Entity\WebhookConfig $webhookConfigs */
+  $webhook_configs = $webhooks_storage->loadMultiple($ids);
 
   /** @var \Drupal\webhooks\WebhookService $webhookService */
-  $webhookService = \Drupal::service('webhooks.service');
-  /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook */
-  foreach ($webhooks as $webhook) {
-    $webhookService->send($webhook, $payload);
+  $webhook_service = \Drupal::service('webhooks.service');
+  /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook_config */
+  foreach ($webhook_configs as $webhook_config) {
+    $webhook = new Webhook(
+      [
+        'Content-Type' => 'application/' . $webhook_config->getContentType(),
+        'X-Drupal-Webhooks-Event' => $event,
+        'X-Drupal-Webhooks-Delivery' => $uuid->generate(),
+      ],
+      ['entity' => $entity->toArray()]
+    );
+
+    $webhook_service->send($webhook_config, $webhook);
   }
 }
 
@@ -81,24 +101,33 @@ function webhooks_entity_update(EntityInterface $entity) {
  * Implements hook_entity_delete().
  */
 function webhooks_entity_delete(EntityInterface $entity) {
+  $uuid = new Uuid();
+  $event = 'entity:' . $entity->getEntityType()->id() . ':delete';
+
   $query = \Drupal::entityQuery('webhook_config')
     ->condition('active', 1)
-    ->condition('events', 'entity:' . $entity->getEntityType()->id() . ':delete', 'CONTAINS');
+    ->condition('events', $event, 'CONTAINS');
   $ids = $query->execute();
 
   /** @var \Drupal\Core\Entity\EntityStorageInterface $webhooks_storage */
   $webhooks_storage = \Drupal::entityTypeManager()->getStorage('webhook_config');
-  $webhooks = $webhooks_storage->loadMultiple($ids);
-
-  $payload = new Payload([
-    'entity' => $entity->toArray(),
-  ]);
+  /** @var \Drupal\webhooks\Entity\WebhookConfig $webhookConfigs */
+  $webhook_configs = $webhooks_storage->loadMultiple($ids);
 
   /** @var \Drupal\webhooks\WebhookService $webhookService */
-  $webhookService = \Drupal::service('webhooks.service');
-  /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook */
-  foreach ($webhooks as $webhook) {
-    $webhookService->send($webhook, $payload);
+  $webhook_service = \Drupal::service('webhooks.service');
+  /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook_config */
+  foreach ($webhook_configs as $webhook_config) {
+    $webhook = new Webhook(
+      [
+        'Content-Type' => 'application/' . $webhook_config->getContentType(),
+        'X-Drupal-Webhooks-Event' => $event,
+        'X-Drupal-Webhooks-Delivery' => $uuid->generate(),
+      ],
+      ['entity' => $entity->toArray()]
+    );
+
+    $webhook_service->send($webhook_config, $webhook);
   }
 }
 
