@@ -52,18 +52,18 @@ class WebhookService implements WebhookServiceInterface {
    * @param \Drupal\webhooks\Entity\Webhook $webhook
    * @param \Drupal\webhooks\Payload $payload
    */
-  public function send(WebhookConfig $webhook, Payload $payload) {
+  public function send(WebhookConfig $webhook_config, Webhook $webhook) {
     $string = self::encode(
-      $payload->getPayload(),
-      $webhook->getContentType()
+      $webhook->getPayload(),
+      $webhook_config->getContentType()
     );
     try {
       $this->client->post(
-        $webhook->getPayloadUrl(),
+        $webhook_config->getPayloadUrl(),
         [
           'body' => $string,
           'headers' => [
-            'Content-Type' => 'application/' . $webhook->getContentType(),
+            'Content-Type' => 'application/' . $webhook_config->getContentType(),
             'X-Drupal-Webhooks-Event' => '',
             'X-Drupal-Webhooks-Delivery' => '',
           ],
@@ -72,16 +72,14 @@ class WebhookService implements WebhookServiceInterface {
     } catch (\Exception $e) {
       $this->loggerFactory->get('webhooks')->error(
         'Could not send Webhook @webhook: @message',
-        ['@webhook' => $webhook->id(), '@message' => $e->getMessage()]
+        ['@webhook' => $webhook_config->id(), '@message' => $e->getMessage()]
       );
     }
 
     /** @var \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher $eventDispatcher */
     $eventDispatcher = \Drupal::service('event_dispatcher');
     $eventDispatcher->dispatch(
-      WebhookEvents::SEND,
-      $webhook,
-      $payload
+      WebhookEvents::SEND, $webhook
     );
   }
 
