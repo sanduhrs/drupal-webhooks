@@ -3,8 +3,8 @@
 namespace Drupal\webhooks;
 
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
-use Drupal\webhooks\Entity\Webhook as WebhookConfig;
-use Drupal\webhooks\Entity\WebhookInterface;
+use Drupal\webhooks\Entity\WebhookConfig;
+use Drupal\webhooks\Entity\WebhookConfigInterface;
 use Drupal\webhooks\Webhook;
 use GuzzleHttp\Client;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,8 +27,14 @@ class WebhookService implements WebhookServiceInterface {
    */
   protected $loggerFactory;
 
+  /**
+   * @var \Symfony\Component\HttpFoundation\RequestStack
+   */
   protected $requestStack;
 
+  /**
+   * @var \Drupal\webhooks\Webhook
+   */
   protected $webhook;
 
   /**
@@ -49,8 +55,8 @@ class WebhookService implements WebhookServiceInterface {
   }
 
   /**
-   * @param \Drupal\webhooks\Entity\Webhook $webhook
-   * @param \Drupal\webhooks\Payload $payload
+   * @param \Drupal\webhooks\Entity\WebhookConfig $webhook_config
+   * @param \Drupal\webhooks\Webhook $webhook
    */
   public function send(WebhookConfig $webhook_config, Webhook $webhook) {
     $string = self::encode(
