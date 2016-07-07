@@ -20,4 +20,12 @@ class ReceiveEvent extends Event {
   public function __construct(Webhook $webhook) {
     $this->webhook = $webhook;
   }
+
+  /**
+   * @return \Drupal\webhooks\Webhook
+   */
+  public function getWebhook() {
+    return $this->webhook;
+  }
+
 }
