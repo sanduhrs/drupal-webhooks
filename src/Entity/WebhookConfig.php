@@ -189,9 +189,13 @@ class WebhookConfig extends ConfigEntityBase implements WebhookConfigInterface {
 
   /**
    * Set active.
+   *
+   * @param $state
+   * @return WebhookConfig
    */
-  public function setActive() {
-    $this->active = TRUE;
+  public function setActive($state) {
+    $this->active = $state;
+    return $this;
   }
 
   /**
