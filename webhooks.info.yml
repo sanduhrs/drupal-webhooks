@@ -2,7 +2,7 @@ name: Webhooks
 type: module
 description: "User-defined HTTP callbacks"
 core: 8.x
-package: Custom
-
+package: Webhooks
+configure: entity.webhooks.collection
 dependencies:
   - serialization
