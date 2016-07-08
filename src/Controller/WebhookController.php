@@ -31,15 +31,23 @@ class WebhookController extends ControllerBase {
    * Access check callback.
    *
    * @param \Drupal\Core\Session\AccountInterface $account
+   *   The current account.
+   *
    * @return \Drupal\Core\Access\AccessResult
+   *   A successful access result.
    */
   public function access(AccountInterface $account) {
     return AccessResult::allowed();
   }
 
   /**
+   * Toggle the active state.
+   *
    * @param mixed $id
-   *  The id of the entity given by route url.
+   *    The id of the entity given by route url.
+   *
+   * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   *   A redirect response object that may be returned by the controller.
    */
   public function toggleActive($id) {
     $webhooks_storage = \Drupal::entityTypeManager()->getStorage('webhook_config');

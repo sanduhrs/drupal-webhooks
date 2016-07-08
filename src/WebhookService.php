@@ -53,8 +53,11 @@ class WebhookService implements WebhookServiceInterface {
    * WebhookService constructor.
    *
    * @param \GuzzleHttp\Client $client
+   *   A http client object.
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
+   *   A logger channel factory object.
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   *   The current request stack object.
    */
   public function __construct(
       Client $client,
@@ -70,7 +73,9 @@ class WebhookService implements WebhookServiceInterface {
    * Send a webhook.
    *
    * @param \Drupal\webhooks\Entity\WebhookConfig $webhook_config
+   *   A webhook config entity.
    * @param \Drupal\webhooks\Webhook $webhook
+   *   A webhook object.
    */
   public function send(WebhookConfig $webhook_config, Webhook $webhook) {
     $headers = $webhook->getHeaders();
@@ -84,7 +89,8 @@ class WebhookService implements WebhookServiceInterface {
         $webhook_config->getPayloadUrl(),
         ['headers' => $headers, 'body' => $body]
       );
-    } catch (\Exception $e) {
+    }
+    catch (\Exception $e) {
       $this->loggerFactory->get('webhooks')->error(
         'Could not send Webhook @webhook: @message',
         ['@webhook' => $webhook_config->id(), '@message' => $e->getMessage()]
@@ -100,9 +106,7 @@ class WebhookService implements WebhookServiceInterface {
 
     $this->loggerFactory->get('webhooks')->info(
       'Sent a Webhook: <code><pre>@webhook</pre></code>',
-      [
-        '@webhook' => print_r($webhook, true)
-      ]
+      ['@webhook' => print_r($webhook, TRUE)]
     );
   }
 
@@ -110,6 +114,7 @@ class WebhookService implements WebhookServiceInterface {
    * Receive a webhook.
    *
    * @return \Drupal\webhooks\Webhook
+   *   A webhook object.
    */
   public function receive() {
     $request = $this->requestStack->getCurrentRequest();
@@ -131,20 +136,22 @@ class WebhookService implements WebhookServiceInterface {
 
     $this->loggerFactory->get('webhooks')->info(
       'Received a Webhook: <code><pre>@webhook</pre></code>',
-      [
-        '@webhook' => print_r($webhook, true)
-      ]
+      ['@webhook' => print_r($webhook, TRUE)]
     );
 
     return $webhook;
   }
 
   /**
-   * Encode a payload.
+   * Encode payload data.
    *
-   * @param $data
-   * @param $content_type
-   * @return mixed
+   * @param array $data
+   *   The payload data array.
+   * @param string $content_type
+   *   The content type string, e.g. json, xml.
+   *
+   * @return string
+   *   A string suitable for a http request.
    */
   public static function encode($data, $content_type) {
     try {
@@ -160,11 +167,15 @@ class WebhookService implements WebhookServiceInterface {
   }
 
   /**
-   * Decode a payload.
+   * Decode payload data.
    *
-   * @param $data
-   * @param $content_type
+   * @param array $data
+   *   The payload data array.
+   * @param string $content_type
+   *   The content type string, e.g. json, xml.
+   *
    * @return mixed
+   *   A string suitable for php usage.
    */
   public static function decode($data, $content_type) {
     try {

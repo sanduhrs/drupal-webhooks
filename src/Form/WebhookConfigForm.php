@@ -6,7 +6,7 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Class webhookForm.
+ * Class WebhookConfigForm.
  *
  * @package Drupal\webhooks\Form
  */
@@ -18,38 +18,35 @@ class WebhookConfigForm extends EntityForm {
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
 
-    /** @var \Drupal\webhooks\Entity\Webhook $webhook */
-    $webhook = $this->entity;
+    /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook_config */
+    $webhook_config = $this->entity;
     $form['label'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Label'),
       '#maxlength' => 255,
-      '#default_value' => $webhook->label(),
+      '#default_value' => $webhook_config->label(),
       '#description' => $this->t("Label for the Webhook."),
       '#required' => TRUE,
     );
-
     $form['id'] = array(
       '#type' => 'machine_name',
-      '#default_value' => $webhook->id(),
+      '#default_value' => $webhook_config->id(),
       '#machine_name' => array(
         'exists' => '\Drupal\webhooks\Entity\WebhookConfig::load',
       ),
-      '#disabled' => !$webhook->isNew(),
+      '#disabled' => !$webhook_config->isNew(),
     );
-
-    $form['payload_url']= array(
+    $form['payload_url'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Payload URL'),
       '#attributes' => array(
         'placeholder' => $this->t('http://example.com/post'),
       ),
-      '#default_value' => $webhook->getPayloadUrl(),
+      '#default_value' => $webhook_config->getPayloadUrl(),
       '#maxlength' => 255,
       '#description' => $this->t("Target URL for your payload."),
       '#required' => TRUE,
     );
-
     $form['secret'] = array(
       '#type' => 'password',
       '#attributes' => array(
@@ -58,27 +55,24 @@ class WebhookConfigForm extends EntityForm {
       '#title' => $this->t('Secret'),
       '#maxlength' => 255,
       '#description' => $this->t("Secret that the target website gave you."),
-      '#default_value' => $webhook->getSecret(),
+      '#default_value' => $webhook_config->getSecret(),
     );
-
     $form['active'] = array(
       '#type' => 'checkbox',
       '#title' => $this->t("Active"),
       '#description' => $this->t("Shows if the webhook is active or not."),
-      '#default_value' => $webhook->isActive(),
+      '#default_value' => $webhook_config->isActive(),
     );
-
     $form['content_type'] = array(
       '#type' => 'select',
       '#title' => $this->t("Content Type"),
       '#description' => $this->t("The Content Type of your webhook."),
       '#options' => [
         'json' => $this->t('application/json'),
-        'xml' => $this->t('application/xml')
+        'xml' => $this->t('application/xml'),
       ],
-      '#default_value' => $webhook->getContentType(),
+      '#default_value' => $webhook_config->getContentType(),
     );
-
     $form['events'] = array(
       '#type' => 'tableselect',
       '#header' => array('type' => 'Entity Type' , 'event' => 'Event'),
@@ -95,9 +89,10 @@ class WebhookConfigForm extends EntityForm {
         'entity:comment:delete' => ['type' => 'Comment' , 'event' => 'Delete'],
       ],
     );
+
     // Check if the entity is not new, cause we get a warning otherwise.
-    if (!$webhook->isNew()) {
-      $form['events']['#default_value'] = $webhook->getEvents();
+    if (!$webhook_config->isNew()) {
+      $form['events']['#default_value'] = $webhook_config->getEvents();
     }
     return $form;
   }

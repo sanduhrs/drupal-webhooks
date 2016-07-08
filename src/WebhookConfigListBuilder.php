@@ -4,19 +4,25 @@ namespace Drupal\webhooks;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Url;
 
 /**
  * Provides a listing of Webhook entities.
  */
 class WebhookConfigListBuilder extends ConfigEntityListBuilder {
 
-  public function getOperations(EntityInterface $entity)
-  {
+  /**
+   * {@inheritdoc}
+   */
+  public function getOperations(EntityInterface $entity) {
     $operations = parent::getOperations($entity);
     $operations['toggle_active'] = array(
       'title' => $entity->isActive() ? t('Deactivate') : t('Activate'),
       'weight' => 50,
-      'url' => \Drupal\Core\Url::fromRoute('webhooks.webhook_toggle_active', array('id' => $entity->id()))
+      'url' => Url::fromRoute(
+        'webhooks.webhook_toggle_active',
+        array('id' => $entity->id())
+      ),
     );
     uasort($operations, '\Drupal\Component\Utility\SortArray::sortByWeightElement');
     return $operations;
@@ -26,9 +32,9 @@ class WebhookConfigListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header['active'] = $this->t('Status');
     $header['label'] = $this->t('Webhook');
     $header['id'] = $this->t('Machine name');
+    $header['active'] = $this->t('Status');
     return $header + parent::buildHeader();
   }
 
@@ -40,7 +46,6 @@ class WebhookConfigListBuilder extends ConfigEntityListBuilder {
       '#type' => 'operations',
       '#links' => $this->getOperations($entity),
     );
-
     return $build;
   }
 
@@ -48,9 +53,9 @@ class WebhookConfigListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-    $row['active'] = $entity->isActive() ? $this->t('Active') : $this->t('Inactive');
     $row['label'] = $entity->label();
     $row['id'] = $entity->id();
+    $row['active'] = $entity->isActive() ? $this->t('Active') : $this->t('Inactive');
     return $row + parent::buildRow($entity);
   }
 

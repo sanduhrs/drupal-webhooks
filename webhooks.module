@@ -5,11 +5,8 @@
  * Contains webhooks.module.
  */
 
-use Drupal\Core\Entity\Entity;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\webhooks\Payload;
-use Drupal\webhooks\WebhookService;
 use Drupal\webhooks\Webhook;
 use Drupal\Component\Uuid\Php as Uuid;
 
@@ -130,4 +127,3 @@ function webhooks_entity_delete(EntityInterface $entity) {
     $webhook_service->send($webhook_config, $webhook);
   }
 }
-

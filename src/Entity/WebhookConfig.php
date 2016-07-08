@@ -77,7 +77,7 @@ class WebhookConfig extends ConfigEntityBase implements WebhookConfigInterface {
   /**
    * The Webhook active.
    *
-   * @var boolean
+   * @var bool
    */
   protected $active;
 
@@ -91,7 +91,7 @@ class WebhookConfig extends ConfigEntityBase implements WebhookConfigInterface {
   /**
    * The Webhook response_ok.
    *
-   * @var boolean
+   * @var bool
    */
   protected $response_ok;
 
@@ -128,84 +128,117 @@ class WebhookConfig extends ConfigEntityBase implements WebhookConfigInterface {
   }
 
   /**
+   * Get the webhook id.
+   *
    * @return string
+   *   The webhooks identifier string.
    */
   public function getId() {
     return $this->id;
   }
 
   /**
+   * Get the webhook label.
+   *
    * @return string
+   *   The webhook label.
    */
   public function getLabel() {
     return $this->label;
   }
 
   /**
+   * Get the payload URL.
+   *
    * @return string
+   *   The payload URL.
    */
   public function getPayloadUrl() {
     return $this->payload_url;
   }
 
   /**
+   * Get the events listening on.
+   *
    * @return string
+   *   The events listening on.
    */
   public function getEvents() {
     return $this->events;
   }
 
   /**
+   * Get the content type.
+   *
    * @return string
+   *   The content type string, e.g. json, xml.
    */
   public function getContentType() {
     return $this->content_type;
   }
 
   /**
-   * @return boolean
+   * Check if is active.
+   *
+   * @return bool
+   *   A bool true if active, false otherwise.
    */
   public function isActive() {
     return $this->active;
   }
 
   /**
-   * @param $state
+   * Set active.
    */
-  public function setActive($state) {
-    $this->active = $state;
+  public function setActive() {
+    $this->active = TRUE;
   }
 
   /**
+   * Get last usage time.
+   *
    * @return int
+   *   The last usage time.
    */
   public function getLastUsage() {
     return $this->last_usage;
   }
 
   /**
-   * @return boolean
+   * Check if last response was ok.
+   *
+   * @return bool
+   *   A bool true if last response was ok, false otherwise.
    */
   public function hasResponseOk() {
     return $this->response_ok;
   }
 
   /**
+   * Get referenced entity type.
+   *
    * @return string
+   *   The referenced entity type.
    */
   public function getRefEntityType() {
     return $this->ref_entity_type;
   }
 
   /**
+   * Get referenced entity id.
+   *
    * @return string
+   *   Get referenced entity id.
    */
   public function getRefEntityId() {
     return $this->ref_entity_id;
   }
 
   /**
+   * Get secret.
+   *
    * @return string
+   *   The secret string.
    */
   public function getSecret() {
     return $this->secret;
