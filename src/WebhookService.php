@@ -2,13 +2,14 @@
 
 namespace Drupal\webhooks;
 
+use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\webhooks\Entity\WebhookConfig;
 use Drupal\webhooks\Event\WebhookEvents;
-use GuzzleHttp\Client;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Drupal\webhooks\Event\ReceiveEvent;
 use Drupal\webhooks\Event\SendEvent;
+use GuzzleHttp\Client;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class WebhookService.
@@ -78,11 +79,21 @@ class WebhookService implements WebhookServiceInterface {
    *   A webhook object.
    */
   public function send(WebhookConfig $webhook_config, Webhook $webhook) {
-    $headers = $webhook->getHeaders();
     $body = self::encode(
       $webhook->getPayload(),
       $webhook_config->getContentType()
     );
+
+    if (!empty($secret = $webhook_config->getSecret())) {
+      $signature = array(
+        'X-Drupal-Webhooks-Signature' => Crypt::hmacBase64(
+            $body,
+            $secret)
+      );
+      $webhook->addHeaders($signature);
+    }
+
+    $headers = $webhook->getHeaders();
 
     try {
       $this->client->post(
