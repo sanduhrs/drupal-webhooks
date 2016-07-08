@@ -2,7 +2,6 @@
 
 namespace Drupal\webhooks;
 
-use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\webhooks\Entity\WebhookConfig;
 use Drupal\webhooks\Event\WebhookEvents;
@@ -86,9 +85,11 @@ class WebhookService implements WebhookServiceInterface {
 
     if (!empty($secret = $webhook_config->getSecret())) {
       $signature = array(
-        'X-Drupal-Webhooks-Signature' => Crypt::hmacBase64(
+        'X-Drupal-Webhooks-Signature' => base64_encode(hash_hmac(
+            'sha256',
             $body,
-            $secret)
+            $secret,
+            true))
       );
       $webhook->addHeaders($signature);
     }
