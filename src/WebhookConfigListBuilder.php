@@ -15,7 +15,7 @@ class WebhookConfigListBuilder extends ConfigEntityListBuilder {
     $operations = parent::getOperations($entity);
     $operations['toggle_active'] = array(
       'title' => $entity->isActive() ? t('Deactivate') : t('Activate'),
-      'weight' => 0,
+      'weight' => 50,
       'url' => \Drupal\Core\Url::fromRoute('webhooks.webhook_toggle_active', array('id' => $entity->id()))
     );
     uasort($operations, '\Drupal\Component\Utility\SortArray::sortByWeightElement');
