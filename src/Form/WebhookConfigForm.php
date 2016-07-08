@@ -89,11 +89,8 @@ class WebhookConfigForm extends EntityForm {
         'entity:comment:delete' => ['type' => 'Comment' , 'event' => 'Delete'],
       ],
     );
+    $form['events']['#default_value'] = $webhook_config->isNew() ? [] : $webhook_config->getEvents();
 
-    // Check if the entity is not new, cause we get a warning otherwise.
-    if (!$webhook_config->isNew()) {
-      $form['events']['#default_value'] = $webhook_config->getEvents();
-    }
     return $form;
   }
 
@@ -103,15 +100,10 @@ class WebhookConfigForm extends EntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     /** @var \Drupal\webhooks\Entity\Webhook $webhook */
     $webhook = $this->entity;
-
     // Keep the old secret if no new one has been given.
     if (empty($form_state->getValue('secret'))) {
       $webhook->set('secret', $form['secret']['#default_value']);
     }
-
-    // Serialize the events array before saving.
-    $webhook->set('events', serialize($form_state->getValue('events')));
-
     $active = $webhook->save();
 
     switch ($active) {

@@ -3,6 +3,7 @@
 namespace Drupal\webhooks\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
  * Defines the Webhook entity.
@@ -218,6 +219,14 @@ class WebhookConfig extends ConfigEntityBase implements WebhookConfigInterface {
    */
   public function getSecret() {
     return $this->secret;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preSave(EntityStorageInterface $storage) {
+    parent::preSave($storage);
+    $this->events = serialize($this->events);
   }
 
 }
