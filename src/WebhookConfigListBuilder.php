@@ -17,7 +17,7 @@ class WebhookConfigListBuilder extends ConfigEntityListBuilder {
   public function getOperations(EntityInterface $entity) {
     $operations = parent::getOperations($entity);
     $operations['toggle_active'] = array(
-      'title' => $entity->isActive() ? t('Deactivate') : t('Activate'),
+      'title' => $entity->status() ? t('Deactivate') : t('Activate'),
       'weight' => 50,
       'url' => Url::fromRoute(
         'webhooks.webhook_toggle_active',
@@ -55,7 +55,7 @@ class WebhookConfigListBuilder extends ConfigEntityListBuilder {
   public function buildRow(EntityInterface $entity) {
     $row['label'] = $entity->label();
     $row['id'] = $entity->id();
-    $row['active'] = $entity->isActive() ? $this->t('Active') : $this->t('Inactive');
+    $row['active'] = $entity->status() ? $this->t('Active') : $this->t('Inactive');
     return $row + parent::buildRow($entity);
   }
 

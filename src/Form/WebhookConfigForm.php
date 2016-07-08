@@ -57,11 +57,11 @@ class WebhookConfigForm extends EntityForm {
       '#description' => $this->t("Secret that the target website gave you."),
       '#default_value' => $webhook_config->getSecret(),
     );
-    $form['active'] = array(
+    $form['status'] = array(
       '#type' => 'checkbox',
       '#title' => $this->t("Active"),
       '#description' => $this->t("Shows if the webhook is active or not."),
-      '#default_value' => $webhook_config->isActive(),
+      '#default_value' => $webhook_config->isNew() ? TRUE : $webhook_config->status(),
     );
     $form['content_type'] = array(
       '#type' => 'select',

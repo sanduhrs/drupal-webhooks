@@ -11,9 +11,6 @@ webhooks.webhook.*:
     uuid:
       type: string
       label: 'UUID'
-    active:
-      type: boolean
-      label: 'Active'
     payload_url:
       type: uri
       label: 'Payload URL'

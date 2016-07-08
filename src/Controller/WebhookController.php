@@ -52,8 +52,7 @@ class WebhookController extends ControllerBase {
   public function toggleActive($id) {
     $webhooks_storage = \Drupal::entityTypeManager()->getStorage('webhook_config');
     $webhook_config = $webhooks_storage->load($id);
-    $webhook_config->setActive(!$webhook_config->isActive());
-    $webhook_config->set('events', serialize($webhook_config->getEvents()));
+    $webhook_config->setStatus(!$webhook_config->status());
     $webhook_config->save();
     return $this->redirect("entity.webhook_config.collection");
   }

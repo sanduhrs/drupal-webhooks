@@ -50,14 +50,6 @@ interface WebhookConfigInterface extends ConfigEntityInterface {
   public function getContentType();
 
   /**
-   * Check if active.
-   *
-   * @return bool
-   *   If is active true, otherwise false.
-   */
-  public function isActive();
-
-  /**
    * Get last usage time.
    *
    * @return int

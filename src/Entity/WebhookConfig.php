@@ -75,13 +75,6 @@ class WebhookConfig extends ConfigEntityBase implements WebhookConfigInterface {
   protected $content_type;
 
   /**
-   * The Webhook active.
-   *
-   * @var bool
-   */
-  protected $active;
-
-  /**
    * The Webhook last usage.
    *
    * @var integer
@@ -175,27 +168,6 @@ class WebhookConfig extends ConfigEntityBase implements WebhookConfigInterface {
    */
   public function getContentType() {
     return $this->content_type;
-  }
-
-  /**
-   * Check if is active.
-   *
-   * @return bool
-   *   A bool true if active, false otherwise.
-   */
-  public function isActive() {
-    return $this->active;
-  }
-
-  /**
-   * Set active.
-   *
-   * @param $state
-   * @return WebhookConfig
-   */
-  public function setActive($state) {
-    $this->active = $state;
-    return $this;
   }
 
   /**
