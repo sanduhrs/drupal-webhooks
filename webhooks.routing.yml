@@ -1,4 +1,3 @@
-
 webhooks.webhook_receive:
   path: '/webhooks'
   methods: [POST]
