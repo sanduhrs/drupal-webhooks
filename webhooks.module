@@ -34,7 +34,7 @@ function webhooks_entity_insert(EntityInterface $entity) {
   $event = 'entity:' . $entity->getEntityType()->id() . ':create';
 
   $query = \Drupal::entityQuery('webhook_config')
-    ->condition('active', 1)
+    ->condition('status', 1)
     ->condition('events', $event, 'CONTAINS');
   $ids = $query->execute();
 
@@ -68,7 +68,7 @@ function webhooks_entity_update(EntityInterface $entity) {
   $event = 'entity:' . $entity->getEntityType()->id() . ':update';
 
   $query = \Drupal::entityQuery('webhook_config')
-    ->condition('active', 1)
+    ->condition('status', 1)
     ->condition('events', $event, 'CONTAINS');
   $ids = $query->execute();
 
@@ -102,7 +102,7 @@ function webhooks_entity_delete(EntityInterface $entity) {
   $event = 'entity:' . $entity->getEntityType()->id() . ':delete';
 
   $query = \Drupal::entityQuery('webhook_config')
-    ->condition('active', 1)
+    ->condition('status', 1)
     ->condition('events', $event, 'CONTAINS');
   $ids = $query->execute();
 
