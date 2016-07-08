@@ -70,7 +70,7 @@ class Webhook {
    *   The webhook.
    */
   public function addHeaders($headers) {
-    array_push($this->headers, $headers);
+    $this->headers = array_merge($this->headers, $headers);
     return $this;
   }
 
