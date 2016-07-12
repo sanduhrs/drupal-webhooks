@@ -258,7 +258,7 @@ class Webhook {
   public function setSecret($secret) {
     $this->secret = $secret;
     $this->addHeaders([
-      'X-Drupal-Webhooks-Signature' => base64_encode(
+      'X-Hub-Signature' => base64_encode(
         hash_hmac('sha256', $this->payload, $secret, TRUE)
       ),
     ]);
