@@ -9,7 +9,6 @@ use Drupal\simpletest\WebTestBase;
  */
 class WebhookTest extends WebTestBase {
 
-
   /**
    * {@inheritdoc}
    */

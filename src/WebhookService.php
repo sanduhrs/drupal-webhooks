@@ -85,11 +85,9 @@ class WebhookService implements WebhookServiceInterface {
 
     if (!empty($secret = $webhook_config->getSecret())) {
       $signature = array(
-        'X-Drupal-Webhooks-Signature' => base64_encode(hash_hmac(
-            'sha256',
-            $body,
-            $secret,
-            true))
+        'X-Drupal-Webhooks-Signature' => base64_encode(
+          hash_hmac('sha256', $body, $secret, TRUE)
+        ),
       );
       $webhook->addHeaders($signature);
     }
