@@ -183,7 +183,8 @@ class WebhooksService implements WebhooksServiceInterface {
         return $encoder->encode($data, $content_type);
       }
     }
-    catch (\Exception $e) {}
+    catch (\Exception $e) {
+    }
     return '';
   }
 
@@ -206,7 +207,8 @@ class WebhooksService implements WebhooksServiceInterface {
         return $encoder->decode($data, $content_type);
       }
     }
-    catch (\Exception $e) {}
+    catch (\Exception $e) {
+    }
     return '';
   }
 
