@@ -50,6 +50,11 @@ class WebhooksService implements WebhooksServiceInterface {
    */
   protected $webhook;
 
+  /**
+   * The event dispatcher.
+   *
+   * @var \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher
+   */
   protected $eventDispatcher;
 
   /**
