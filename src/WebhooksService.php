@@ -136,24 +136,15 @@ class WebhooksService implements WebhooksServiceInterface {
   public function send(WebhookConfig $webhook_config, Webhook $webhook) {
     $uuid = new Uuid();
     $webhook->setUuid($uuid->generate());
+    if ($secret = $webhook_config->getSecret()) {
+      $webhook->setSecret($secret);
+    }
 
+    $headers = $webhook->getHeaders();
     $body = self::encode(
       $webhook->getPayload(),
       $webhook_config->getContentType()
     );
-
-    if (!empty($secret = $webhook_config->getSecret())) {
-      $signature = [
-        'X-Drupal-Webhooks-Signature' => base64_encode(
-          hash_hmac('sha256', $body, $secret, TRUE)
-        ),
-      ];
-      $webhook->addHeaders($signature);
-    }
-
-    $webhook->verify();
-
-    $headers = $webhook->getHeaders();
 
     try {
       $this->client->post(

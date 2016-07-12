@@ -47,6 +47,13 @@ class Webhook {
   protected $contentType;
 
   /**
+   * The secret.
+   *
+   * @var string
+   */
+  protected $secret;
+
+  /**
    * Webhook constructor.
    *
    * @param array $payload
@@ -69,7 +76,6 @@ class Webhook {
 
     $uuid = new Uuid();
     $this->setUuid($uuid->generate());
-
   }
 
   /**
@@ -228,6 +234,34 @@ class Webhook {
     $this->addHeaders(
       ['Content-Type' => 'application/' . $content_type]
     );
+    return $this;
+  }
+
+  /**
+   * Get the secret.
+   *
+   * @return string
+   *   The secret string.
+   */
+  public function getSecret() {
+    return $this->secret;
+  }
+
+  /**
+   * Set the secret.
+   *
+   * @param string $secret
+   *   A secret string.
+   *
+   * @return $this
+   */
+  public function setSecret($secret) {
+    $this->secret = $secret;
+    $this->addHeaders([
+      'X-Drupal-Webhooks-Signature' => base64_encode(
+        hash_hmac('sha256', $this->payload, $secret, TRUE)
+      ),
+    ]);
     return $this;
   }
 
