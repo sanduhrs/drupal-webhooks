@@ -98,27 +98,29 @@ class WebhookConfigForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    /** @var \Drupal\webhooks\Entity\Webhook $webhook */
-    $webhook = $this->entity;
+    /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook_config */
+    $webhook_config = $this->entity;
     // Keep the old secret if no new one has been given.
     if (empty($form_state->getValue('secret'))) {
-      $webhook->set('secret', $form['secret']['#default_value']);
+      $webhook_config->set('secret', $form['secret']['#default_value']);
     }
-    $active = $webhook->save();
+    $active = $webhook_config->save();
 
     switch ($active) {
       case SAVED_NEW:
         drupal_set_message($this->t('Created the %label Webhook.', [
-          '%label' => $webhook->label(),
+          '%label' => $webhook_config->label(),
         ]));
         break;
 
       default:
         drupal_set_message($this->t('Saved the %label Webhook.', [
-          '%label' => $webhook->label(),
+          '%label' => $webhook_config->label(),
         ]));
     }
-    $form_state->setRedirectUrl($webhook->urlInfo('collection'));
+    /** @var \Drupal\Core\Url $url */
+    $url = $webhook_config->urlInfo('collection');
+    $form_state->setRedirectUrl($url);
   }
 
 }
