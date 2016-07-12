@@ -7,5 +7,5 @@ namespace Drupal\webhooks;
  *
  * @package Drupal\webhooks
  */
-interface WebhookServiceInterface {
+interface WebhooksServiceInterface {
 }

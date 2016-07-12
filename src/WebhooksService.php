@@ -2,6 +2,7 @@
 
 namespace Drupal\webhooks;
 
+use Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\webhooks\Entity\WebhookConfig;
 use Drupal\webhooks\Event\WebhookEvents;
@@ -15,7 +16,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  *
  * @package Drupal\webhooks
  */
-class WebhookService implements WebhookServiceInterface {
+class WebhooksService implements WebhooksServiceInterface {
 
   const CONTENT_TYPE_JSON = 'json';
 
@@ -49,24 +50,30 @@ class WebhookService implements WebhookServiceInterface {
    */
   protected $webhook;
 
+  protected $eventDispatcher;
+
   /**
    * WebhookService constructor.
    *
    * @param \GuzzleHttp\Client $client
-   *   A http client object.
+   *   A http client.
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
-   *   A logger channel factory object.
+   *   A logger channel factory.
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The current request stack object.
+   *   The current request stack.
+   * @param \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher $event_dispatcher
+   *   The event dispatcher.
    */
   public function __construct(
       Client $client,
       LoggerChannelFactoryInterface $logger_factory,
-      RequestStack $request_stack
+      RequestStack $request_stack,
+      ContainerAwareEventDispatcher $event_dispatcher
   ) {
     $this->client = $client;
     $this->loggerFactory = $logger_factory;
     $this->requestStack = $request_stack;
+    $this->eventDispatcher = $event_dispatcher;
   }
 
   /**
@@ -84,11 +91,11 @@ class WebhookService implements WebhookServiceInterface {
     );
 
     if (!empty($secret = $webhook_config->getSecret())) {
-      $signature = array(
+      $signature = [
         'X-Drupal-Webhooks-Signature' => base64_encode(
           hash_hmac('sha256', $body, $secret, TRUE)
         ),
-      );
+      ];
       $webhook->addHeaders($signature);
     }
 
@@ -107,13 +114,13 @@ class WebhookService implements WebhookServiceInterface {
       );
     }
 
-    /** @var \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher $eventDispatcher */
-    $eventDispatcher = \Drupal::service('event_dispatcher');
-    $eventDispatcher->dispatch(
+    // Dispatch Webhook Send event.
+    $this->eventDispatcher->dispatch(
       WebhookEvents::SEND,
       new SendEvent($webhook_config, $webhook)
     );
 
+    // Log the sent webhook.
     $this->loggerFactory->get('webhooks')->info(
       'Sent a Webhook: <code><pre>@webhook</pre></code>',
       ['@webhook' => print_r($webhook, TRUE)]
@@ -129,7 +136,7 @@ class WebhookService implements WebhookServiceInterface {
   public function receive() {
     $request = $this->requestStack->getCurrentRequest();
     $headers = $request->headers->all();
-    $payload = WebhookService::decode(
+    $payload = WebhooksService::decode(
       $request->getContent(),
       $request->getContentType()
     );
@@ -137,13 +144,13 @@ class WebhookService implements WebhookServiceInterface {
     /** @var \Drupal\webhooks\Webhook $webhook */
     $webhook = new Webhook($headers, $payload);
 
-    /** @var \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher $eventDispatcher */
-    $eventDispatcher = \Drupal::service('event_dispatcher');
-    $eventDispatcher->dispatch(
+    // Dispatch Webhook Receive event.
+    $this->eventDispatcher->dispatch(
       WebhookEvents::RECEIVE,
       new ReceiveEvent($webhook)
     );
 
+    // Log the received webhook.
     $this->loggerFactory->get('webhooks')->info(
       'Received a Webhook: <code><pre>@webhook</pre></code>',
       ['@webhook' => print_r($webhook, TRUE)]
@@ -171,9 +178,8 @@ class WebhookService implements WebhookServiceInterface {
         return $encoder->encode($data, $content_type);
       }
     }
-    catch (\Exception $e) {
-      return '';
-    }
+    catch (\Exception $e) {}
+    return '';
   }
 
   /**
@@ -195,9 +201,8 @@ class WebhookService implements WebhookServiceInterface {
         return $encoder->decode($data, $content_type);
       }
     }
-    catch (\Exception $e) {
-      return '';
-    }
+    catch (\Exception $e) {}
+    return '';
   }
 
 }

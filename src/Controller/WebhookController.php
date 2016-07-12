@@ -21,9 +21,9 @@ class WebhookController extends ControllerBase {
    *   Return 200 OK.
    */
   public function receive() {
-    /** @var \Drupal\webhooks\WebhookService $webhookService */
-    $webhookService = \Drupal::service('webhooks.service');
-    $webhookService->receive();
+    /** @var \Drupal\webhooks\WebhooksService $webhooksService */
+    $webhooksService = \Drupal::service('webhooks.service');
+    $webhooksService->receive();
     return new Response(200, [], 'OK');
   }
 
