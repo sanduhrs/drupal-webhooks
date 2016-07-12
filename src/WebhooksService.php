@@ -3,6 +3,9 @@
 namespace Drupal\webhooks;
 
 use Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher;
+use Drupal\Component\Uuid\Php as Uuid;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\webhooks\Entity\WebhookConfig;
 use Drupal\webhooks\Event\WebhookEvents;
@@ -58,6 +61,20 @@ class WebhooksService implements WebhooksServiceInterface {
   protected $eventDispatcher;
 
   /**
+   * The query factory.
+   *
+   * @var \Drupal\Core\Entity\Query\QueryFactory
+   */
+  protected $queryFactory;
+
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
    * WebhookService constructor.
    *
    * @param \GuzzleHttp\Client $client
@@ -68,17 +85,44 @@ class WebhooksService implements WebhooksServiceInterface {
    *   The current request stack.
    * @param \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher $event_dispatcher
    *   The event dispatcher.
+   * @param \Drupal\Core\Entity\Query\QueryFactory $query_factory
+   *   The query factory.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    */
   public function __construct(
       Client $client,
       LoggerChannelFactoryInterface $logger_factory,
       RequestStack $request_stack,
-      ContainerAwareEventDispatcher $event_dispatcher
+      ContainerAwareEventDispatcher $event_dispatcher,
+      QueryFactory $query_factory,
+      EntityTypeManagerInterface $entity_type_manager
   ) {
     $this->client = $client;
     $this->loggerFactory = $logger_factory;
     $this->requestStack = $request_stack;
     $this->eventDispatcher = $event_dispatcher;
+    $this->queryFactory = $query_factory;
+    $this->entityTypeManager = $entity_type_manager;
+  }
+
+  /**
+   * Load multiple WebhookConfigs by event.
+   *
+   * @param string $event
+   *   An event string in the form of entity:entity_type:action,
+   *   e.g. 'entity:user:create', 'entity:user:update' or 'entity:user:delete'.
+   *
+   * @return \Drupal\webhooks\Entity\WebhookConfigInterface[]
+   *   An array of WebhookConfig entities.
+   */
+  public function loadMultipleByEvent($event) {
+    $query = $this->queryFactory->get('webhook_config')
+      ->condition('status', 1)
+      ->condition('events', $event, 'CONTAINS');
+    $ids = $query->execute();
+    return $this->entityTypeManager->getStorage('webhook_config')
+      ->loadMultiple($ids);
   }
 
   /**
@@ -90,6 +134,9 @@ class WebhooksService implements WebhooksServiceInterface {
    *   A webhook object.
    */
   public function send(WebhookConfig $webhook_config, Webhook $webhook) {
+    $uuid = new Uuid();
+    $webhook->setUuid($uuid->generate());
+
     $body = self::encode(
       $webhook->getPayload(),
       $webhook_config->getContentType()
@@ -103,6 +150,8 @@ class WebhooksService implements WebhooksServiceInterface {
       ];
       $webhook->addHeaders($signature);
     }
+
+    $webhook->verify();
 
     $headers = $webhook->getHeaders();
 
