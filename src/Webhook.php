@@ -267,4 +267,37 @@ class Webhook {
     return $this;
   }
 
+  /**
+   * Get the payload signature from headers.
+   *
+   * @return string
+   *   The signature string, e.g. 'sha1=fmoeaihfoechfynzgcdwycu6ra3umfhsdfsdfuu'
+   */
+  public function getSignature() {
+    $headers = $this->getHeaders();
+    foreach ($headers as $key => $value) {
+      if (strtolower($key) === 'x-hub-signature') {
+        return $value;
+      }
+    }
+    return '';
+  }
+
+  /**
+   * Verify the webhook with the stored secret.
+   *
+   * @return bool
+   *   Boolean TRUE for success, FALSE otherwise.
+   */
+  public function verify() {
+    list($algorithm, $user_string) = explode('=', $this->getSignature());
+    $known_string = hash_hmac(
+      $algorithm,
+      json_encode($this->payload),
+      $this->secret
+    );
+    $equal = hash_equals($known_string, $user_string);
+    return $equal;
+  }
+
 }
