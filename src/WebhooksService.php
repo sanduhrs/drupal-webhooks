@@ -188,6 +188,10 @@ class WebhooksService implements WebhooksServiceInterface {
 
     /** @var \Drupal\webhooks\Webhook $webhook */
     $webhook = new Webhook($headers, $payload);
+    $signature = $webhook->getSignature();
+    if (!empty($signature)) {
+      $webhook->verify();
+    }
 
     // Dispatch Webhook Receive event.
     $this->eventDispatcher->dispatch(
