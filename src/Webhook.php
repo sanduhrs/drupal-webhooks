@@ -260,9 +260,7 @@ class Webhook {
   public function setSecret($secret) {
     $this->secret = $secret;
     $this->addHeaders([
-      'X-Hub-Signature' => base64_encode(
-        hash_hmac('sha256', $this->payload, $secret, TRUE)
-      ),
+      'X-Hub-Signature' => 'sha1=' . hash_hmac('sha1', json_encode($this->payload), $secret, FALSE),
     ]);
     return $this;
   }
