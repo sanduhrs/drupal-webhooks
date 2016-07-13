@@ -296,8 +296,7 @@ class Webhook {
       json_encode($this->payload),
       $this->secret
     );
-    $equal = hash_equals($known_string, $user_string);
-    return $equal;
+    return hash_equals($known_string, $user_string);
   }
 
 }
