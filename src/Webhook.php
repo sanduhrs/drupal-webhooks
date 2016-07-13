@@ -58,6 +58,8 @@ class Webhook {
    *
    * @param array $payload
    *   The payload that is being send with the webhook.
+   * @param array $headers
+   *   The headers that are being send with the webhook.
    * @param string $event
    *   The event that is acted upon.
    * @param string $content_type
@@ -65,10 +67,11 @@ class Webhook {
    */
   public function __construct(
       $payload = [],
+      $headers = [],
       $event = 'default',
       $content_type = 'json'
   ) {
-    $this->headers = [];
+    $this->headers = $headers;
 
     $this->setPayload($payload);
     $this->setEvent($event);
