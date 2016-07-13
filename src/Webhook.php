@@ -140,6 +140,7 @@ class Webhook {
    */
   public function setPayload($payload) {
     $this->payload = $payload;
+    $this->setSecret($this->secret);
     return $this;
   }
 
@@ -157,6 +158,7 @@ class Webhook {
       $this->payload,
       $payload
     );
+    $this->setSecret($this->secret);
     return $this;
   }
 
