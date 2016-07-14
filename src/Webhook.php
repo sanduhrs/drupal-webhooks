@@ -3,7 +3,7 @@
 namespace Drupal\webhooks;
 
 use Drupal\Component\Uuid\Php as Uuid;
-use Drupal\webhooks\Exception;
+use Drupal\webhooks\Exception\WebhookMismatchSignatureException;
 
 /**
  * Class Webhook.
@@ -72,8 +72,7 @@ class Webhook {
       $event = 'default',
       $content_type = 'json'
   ) {
-    $this->headers = $headers;
-
+    $this->setHeaders($headers);
     $this->setPayload($payload);
     $this->setEvent($event);
     $this->setContentType($content_type);
@@ -102,6 +101,12 @@ class Webhook {
    *   The webhook.
    */
   public function setHeaders($headers) {
+    // RequestStack returns the Header-Value as an array.
+    foreach ($headers as $key => $value) {
+      if (is_array($value)) {
+        $headers[$key] = reset($value);
+      }
+    }
     $this->headers = $headers;
     return $this;
   }
@@ -263,9 +268,6 @@ class Webhook {
    */
   public function setSecret($secret) {
     $this->secret = $secret;
-    $this->addHeaders([
-      'X-Hub-Signature' => 'sha1=' . hash_hmac('sha1', json_encode($this->payload), $secret, FALSE),
-    ]);
     return $this;
   }
 
@@ -283,6 +285,19 @@ class Webhook {
       }
     }
     return '';
+  }
+
+  /**
+   * Set the payload signature.
+   *
+   * @return array
+   *   Returns the updated headers.
+   */
+  public function setSignature() {
+    $this->addHeaders([
+      'X-Hub-Signature' => 'sha1=' . hash_hmac('sha1', json_encode($this->payload), $this->secret, FALSE),
+    ]);
+    return $this->headers;
   }
 
   /**
