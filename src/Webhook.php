@@ -3,6 +3,7 @@
 namespace Drupal\webhooks;
 
 use Drupal\Component\Uuid\Php as Uuid;
+use Drupal\webhooks\Exception;
 
 /**
  * Class Webhook.
@@ -297,7 +298,10 @@ class Webhook {
       json_encode($this->payload),
       $this->secret
     );
-    return hash_equals($known_string, $user_string);
+    if (!hash_equals($known_string, $user_string)) {
+      throw new WebhookMismatchSignatureException($user_string, $known_string);
+    }
+    return TRUE;
   }
 
 }

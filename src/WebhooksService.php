@@ -138,6 +138,7 @@ class WebhooksService implements WebhooksServiceInterface {
     $webhook->setUuid($uuid->generate());
     if ($secret = $webhook_config->getSecret()) {
       $webhook->setSecret($secret);
+      $webhook->setSignature();
     }
 
     $headers = $webhook->getHeaders();
@@ -190,19 +191,13 @@ class WebhooksService implements WebhooksServiceInterface {
     $webhook = new Webhook($payload, $headers);
     $signature = $webhook->getSignature();
     if (!empty($signature)) {
-      $status = $webhook->verify();
+      $webhook->verify();
     }
 
     // Dispatch Webhook Receive event.
     $this->eventDispatcher->dispatch(
       WebhookEvents::RECEIVE,
       new ReceiveEvent($webhook)
-    );
-
-    // Log the received webhook.
-    $this->loggerFactory->get('webhooks')->info(
-      'Received a Webhook: <code><pre>@webhook</pre></code>',
-      ['@webhook' => print_r($webhook, TRUE)]
     );
 
     return $webhook;
