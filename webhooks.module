@@ -42,6 +42,8 @@ function webhooks_entity_insert(EntityInterface $entity) {
       [],
       $event
     );
+    // TODO: We should only send when the webhook_config actually contains the
+    // event we are listening for.
     $webhooks_service->send($webhook_config, $webhook);
   }
 }
