@@ -7,7 +7,8 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\webhooks\Exception;
+use Drupal\webhooks\Exception\WebhookIncomingEndpointNotFoundException;
+use Drupal\webhooks\Exception\WebhookMismatchSignatureException;
 use Drupal\webhooks\WebhooksService;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Psr7\Response;
@@ -69,10 +70,17 @@ class WebhookController extends ControllerBase {
    * @return Response
    *   Return 200 OK.
    */
-  public function receive() {
+  public function receive($incoming_webhook_name) {
     try {
-      $this->webhooksService->receive();
-    } catch (WebhookMismatchSignatureException $e) {
+      $this->webhooksService->receive($incoming_webhook_name);
+    }
+    catch (WebhookIncomingEndpointNotFoundException $e) {
+      $this->loggerFactory->get('webhooks')->error(
+        $e->getMessage()
+      );
+      return new Response(404, [], $e->getMessage());
+    }
+    catch (WebhookMismatchSignatureException $e) {
       $this->loggerFactory->get('webhooks')->error(
         'Signature not matching for received Webhook @webhook: @message',
         ['@webhook' => $webhook_config->id(), '@message' => $e->getMessage()]

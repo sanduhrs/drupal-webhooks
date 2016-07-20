@@ -11,6 +11,7 @@ use Drupal\webhooks\Entity\WebhookConfig;
 use Drupal\webhooks\Event\WebhookEvents;
 use Drupal\webhooks\Event\ReceiveEvent;
 use Drupal\webhooks\Event\SendEvent;
+use Drupal\webhooks\Exception\WebhookIncomingEndpointNotFoundException;
 use GuzzleHttp\Client;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -179,7 +180,16 @@ class WebhooksService implements WebhooksServiceInterface {
    * @return \Drupal\webhooks\Webhook
    *   A webhook object.
    */
-  public function receive() {
+  public function receive($incoming_webhook_name) {
+    // We only receive webhook requests when a webhook configuration exists
+    // with a matching machine name.
+    $query = $this->queryFactory->get('webhook_config')
+      ->condition('status', 1);
+    $ids = $query->execute();
+    if (!array_key_exists($incoming_webhook_name, $ids)) {
+      throw new WebhookIncomingEndpointNotFoundException($incoming_webhook_name);
+    }
+
     $request = $this->requestStack->getCurrentRequest();
     $headers = $request->headers->all();
     $payload = WebhooksService::decode(

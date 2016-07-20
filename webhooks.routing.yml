@@ -1,5 +1,5 @@
 webhooks.webhook_receive:
-  path: '/webhooks'
+  path: '/webhook/{incoming_webhook_name}'
   methods: [POST]
   defaults:
     _controller: '\Drupal\webhooks\Controller\WebhookController::receive'
