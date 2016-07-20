@@ -19,7 +19,7 @@ function webhooks_help($route_name, RouteMatchInterface $route_match) {
     case 'help.page.webhooks':
       $output = '';
       $output .= '<h3>' . t('Webhooks') . '</h3>';
-      $output .= '<p>' . t('My Awesome Module') . '</p>';
+      $output .= '<p>' . t('Webhooks module') . '</p>';
       return $output;
 
     default:
