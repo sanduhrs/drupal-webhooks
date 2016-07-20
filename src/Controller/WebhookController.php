@@ -10,10 +10,8 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\webhooks\Exception\WebhookIncomingEndpointNotFoundException;
 use Drupal\webhooks\Exception\WebhookMismatchSignatureException;
 use Drupal\webhooks\WebhooksService;
-use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Psr7\Response;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-
 
 /**
  * Class Webhook.
