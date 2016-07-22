@@ -275,7 +275,7 @@ class Webhook {
    * Get the payload signature from headers.
    *
    * @return string
-   *   The signature string, e.g. 'sha1=fmoeaihfoechfynzgcdwycu6ra3umfhsdfsdfuu'
+   *   The signature string, e.g. 'sha1=de7c9b85b8b78aa6bc8a7a36f70a90701c9db4d9'
    */
   public function getSignature() {
     $headers = $this->getHeaders();
