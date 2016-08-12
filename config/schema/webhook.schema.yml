@@ -14,6 +14,9 @@ webhooks.webhook.*:
     payload_url:
       type: uri
       label: 'Payload URL'
+    type:
+      type: string
+      label: 'Type'
     last_usage:
       type: date_format
       label: 'Last usage of a Webhook'

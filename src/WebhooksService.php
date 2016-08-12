@@ -119,14 +119,17 @@ class WebhooksService implements WebhooksServiceInterface {
    * @param string $event
    *   An event string in the form of entity:entity_type:action,
    *   e.g. 'entity:user:create', 'entity:user:update' or 'entity:user:delete'.
+   * @param string $type
+   *   A type string, e.g. 'outgoing' or 'incoming'.
    *
    * @return \Drupal\webhooks\Entity\WebhookConfigInterface[]
    *   An array of WebhookConfig entities.
    */
-  public function loadMultipleByEvent($event) {
+  public function loadMultipleByEvent($event, $type = 'outgoing') {
     $query = $this->queryFactory->get('webhook_config')
       ->condition('status', 1)
-      ->condition('events', $event, 'CONTAINS');
+      ->condition('events', $event, 'CONTAINS')
+      ->condition('type', $type, '=');
     $ids = $query->execute();
     return $this->entityTypeManager->getStorage('webhook_config')
       ->loadMultiple($ids);

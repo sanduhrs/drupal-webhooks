@@ -36,6 +36,18 @@ class WebhookConfigForm extends EntityForm {
       ),
       '#disabled' => !$webhook_config->isNew(),
     );
+    $form['type'] = array(
+      '#type' => 'select',
+      '#title' => $this->t('Type'),
+      '#options' => [
+        'incoming' => $this->t('Incoming'),
+        'outgoing' => $this->t('Outgoing'),
+      ],
+      '#default_value' => $webhook_config->getType() ? $webhook_config->getType() : 'outgoing',
+      '#description' => $this->t("The webhook type, e.g. incoming or outgoing."),
+      '#required' => TRUE,
+      '#access' => FALSE,
+    );
     $form['payload_url'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Payload URL'),

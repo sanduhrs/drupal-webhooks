@@ -62,6 +62,13 @@ class WebhookConfig extends ConfigEntityBase implements WebhookConfigInterface {
   protected $payload_url;
 
   /**
+   * The Webhook type.
+   *
+   * @var string
+   */
+  protected $type;
+
+  /**
    * The Webhook events.
    *
    * @var array
@@ -149,6 +156,16 @@ class WebhookConfig extends ConfigEntityBase implements WebhookConfigInterface {
    */
   public function getPayloadUrl() {
     return $this->payload_url;
+  }
+
+  /**
+   * Get the type.
+   *
+   * @return string
+   *   The webhook type.
+   */
+  public function getType() {
+    return $this->type;
   }
 
   /**
