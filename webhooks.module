@@ -34,16 +34,18 @@ function webhooks_entity_insert(EntityInterface $entity) {
   /** @var \Drupal\webhooks\WebhooksService $webhooks_service */
   $webhooks_service = \Drupal::service('webhooks.service');
 
+  // Load all webhooks for the occurring event.
   $webhook_configs = $webhooks_service->loadMultipleByEvent($event);
+
   /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook_config */
   foreach ($webhook_configs as $webhook_config) {
+    // Create the Webhook object.
     $webhook = new Webhook(
       ['entity' => $entity->toArray()],
       [],
       $event
     );
-    // TODO: We should only send when the webhook_config actually contains the
-    // event we are listening for.
+    // Send the Webhook object.
     $webhooks_service->send($webhook_config, $webhook);
   }
 }
@@ -57,14 +59,18 @@ function webhooks_entity_update(EntityInterface $entity) {
   /** @var \Drupal\webhooks\WebhooksService $webhooks_service */
   $webhooks_service = \Drupal::service('webhooks.service');
 
+  // Load all webhooks for the occurring event.
   $webhook_configs = $webhooks_service->loadMultipleByEvent($event);
+
   /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook_config */
   foreach ($webhook_configs as $webhook_config) {
+    // Create the Webhook object.
     $webhook = new Webhook(
       ['entity' => $entity->toArray()],
       [],
       $event
     );
+    // Send the Webhook object.
     $webhooks_service->send($webhook_config, $webhook);
   }
 }
@@ -78,14 +84,18 @@ function webhooks_entity_delete(EntityInterface $entity) {
   /** @var \Drupal\webhooks\WebhooksService $webhooks_service */
   $webhooks_service = \Drupal::service('webhooks.service');
 
+  // Load all webhooks for the occurring event.
   $webhook_configs = $webhooks_service->loadMultipleByEvent($event);
+
   /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook_config */
   foreach ($webhook_configs as $webhook_config) {
+    // Create the Webhook object.
     $webhook = new Webhook(
       ['entity' => $entity->toArray()],
       [],
       $event
     );
+    // Send the Webhook object.
     $webhooks_service->send($webhook_config, $webhook);
   }
 }

@@ -20,8 +20,18 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class WebhookController extends ControllerBase {
 
+  /**
+   * The webhooks service.
+   *
+   * @var \Drupal\webhooks\WebhooksService
+   */
   protected $webhooksService;
 
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
   protected $entityTypeManager;
 
   /**

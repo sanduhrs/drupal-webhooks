@@ -22,8 +22,14 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class WebhooksService implements WebhooksServiceInterface {
 
+  /**
+   * The Json format.
+   */
   const CONTENT_TYPE_JSON = 'json';
 
+  /**
+   * The Xml format.
+   */
   const CONTENT_TYPE_XML = 'xml';
 
   /**
@@ -179,6 +185,9 @@ class WebhooksService implements WebhooksServiceInterface {
    *
    * @return \Drupal\webhooks\Webhook
    *   A webhook object.
+   *
+   * @throws \Drupal\webhooks\Exception\WebhookIncomingEndpointNotFoundException
+   *   Thrown when the webhook endpoint is not found.
    */
   public function receive($incoming_webhook_name) {
     // We only receive webhook requests when a webhook configuration exists
@@ -242,18 +251,18 @@ class WebhooksService implements WebhooksServiceInterface {
    *
    * @param array $data
    *   The payload data array.
-   * @param string $content_type
-   *   The content type string, e.g. json, xml.
+   * @param string $format
+   *   The format string, e.g. json, xml.
    *
    * @return mixed
    *   A string suitable for php usage.
    */
-  public static function decode($data, $content_type) {
+  public static function decode($data, $format) {
     try {
       /** @var \Drupal\serialization\Encoder\JsonEncoder $encoder */
-      $encoder = \Drupal::service('serializer.encoder.' . $content_type);
-      if (!empty($encoder) && $encoder->supportsDecoding($content_type)) {
-        return $encoder->decode($data, $content_type);
+      $encoder = \Drupal::service('serializer.encoder.' . $format);
+      if (!empty($encoder) && $encoder->supportsDecoding($format)) {
+        return $encoder->decode($data, $format);
       }
     }
     catch (\Exception $e) {
