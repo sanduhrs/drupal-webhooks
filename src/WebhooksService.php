@@ -186,20 +186,23 @@ class WebhooksService implements WebhooksServiceInterface {
   /**
    * Receive a webhook.
    *
+   * @param string $name
+   *   The machine name of a webhook.
+   *
    * @return \Drupal\webhooks\Webhook
    *   A webhook object.
    *
    * @throws \Drupal\webhooks\Exception\WebhookIncomingEndpointNotFoundException
    *   Thrown when the webhook endpoint is not found.
    */
-  public function receive($incoming_webhook_name) {
+  public function receive($name) {
     // We only receive webhook requests when a webhook configuration exists
     // with a matching machine name.
     $query = $this->queryFactory->get('webhook_config')
       ->condition('status', 1);
     $ids = $query->execute();
-    if (!array_key_exists($incoming_webhook_name, $ids)) {
-      throw new WebhookIncomingEndpointNotFoundException($incoming_webhook_name);
+    if (!array_key_exists($name, $ids)) {
+      throw new WebhookIncomingEndpointNotFoundException($name);
     }
 
     $request = $this->requestStack->getCurrentRequest();

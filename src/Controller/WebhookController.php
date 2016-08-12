@@ -75,12 +75,15 @@ class WebhookController extends ControllerBase {
   /**
    * Webhooks receiver.
    *
-   * @return Response
-   *   Return 200 OK.
+   * @param string $name
+   *   The machine name of a webhook.
+   *
+   * @return \GuzzleHttp\Psr7\Response
+   *   Return a response with code 200 for OK or code 500 in case of error.
    */
-  public function receive($incoming_webhook_name) {
+  public function receive($name) {
     try {
-      $this->webhooksService->receive($incoming_webhook_name);
+      $this->webhooksService->receive($name);
     }
     catch (WebhookIncomingEndpointNotFoundException $e) {
       $this->loggerFactory->get('webhooks')->error(
