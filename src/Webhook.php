@@ -275,7 +275,7 @@ class Webhook {
    * Get the payload signature from headers.
    *
    * @return string
-   *   The signature string, e.g. 'sha1=de7c9b85b8b78aa6bc8a7a36f70a90701c9db4d9'
+   *   The signature string, e.g. sha1=de7c9b85b8b78aa6bc8a7a36f70a90701c9db4d9
    */
   public function getSignature() {
     $headers = $this->getHeaders();
@@ -305,6 +305,9 @@ class Webhook {
    *
    * @return bool
    *   Boolean TRUE for success, FALSE otherwise.
+   *
+   * @throws WebhookMismatchSignatureException
+   *   Throws exception if signatures do not match.
    */
   public function verify() {
     list($algorithm, $user_string) = explode('=', $this->getSignature());
