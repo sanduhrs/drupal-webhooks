@@ -46,7 +46,6 @@ class WebhookConfigForm extends EntityForm {
       '#default_value' => $webhook_config->getType() ? $webhook_config->getType() : 'outgoing',
       '#description' => $this->t("The webhook type, e.g. incoming or outgoing."),
       '#required' => TRUE,
-      '#access' => FALSE,
     );
     $form['payload_url'] = array(
       '#type' => 'textfield',
@@ -81,7 +80,6 @@ class WebhookConfigForm extends EntityForm {
       '#description' => $this->t("The Content Type of your webhook."),
       '#options' => [
         'json' => $this->t('application/json'),
-        //'xml' => $this->t('application/xml'),
       ],
       '#default_value' => $webhook_config->getContentType(),
     );
