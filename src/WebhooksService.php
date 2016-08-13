@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  *
  * @package Drupal\webhooks
  */
-class WebhooksService implements WebhooksServiceInterface {
+class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInterface {
 
   /**
    * The Json format.
@@ -114,16 +114,7 @@ class WebhooksService implements WebhooksServiceInterface {
   }
 
   /**
-   * Load multiple WebhookConfigs by event.
-   *
-   * @param string $event
-   *   An event string in the form of entity:entity_type:action,
-   *   e.g. 'entity:user:create', 'entity:user:update' or 'entity:user:delete'.
-   * @param string $type
-   *   A type string, e.g. 'outgoing' or 'incoming'.
-   *
-   * @return \Drupal\webhooks\Entity\WebhookConfigInterface[]
-   *   An array of WebhookConfig entities.
+   * {@inheritdoc}
    */
   public function loadMultipleByEvent($event, $type = 'outgoing') {
     $query = $this->queryFactory->get('webhook_config')
@@ -136,12 +127,7 @@ class WebhooksService implements WebhooksServiceInterface {
   }
 
   /**
-   * Send a webhook.
-   *
-   * @param \Drupal\webhooks\Entity\WebhookConfig $webhook_config
-   *   A webhook config entity.
-   * @param \Drupal\webhooks\Webhook $webhook
-   *   A webhook object.
+   * {@inheritdoc}
    */
   public function send(WebhookConfig $webhook_config, Webhook $webhook) {
     $uuid = new Uuid();
@@ -151,8 +137,7 @@ class WebhooksService implements WebhooksServiceInterface {
       $webhook->setSignature();
     }
 
-    $headers = $webhook->getHeaders();
-    $body = self::encode(
+    $body = static::encode(
       $webhook->getPayload(),
       $webhook_config->getContentType()
     );
@@ -160,7 +145,10 @@ class WebhooksService implements WebhooksServiceInterface {
     try {
       $this->client->post(
         $webhook_config->getPayloadUrl(),
-        ['headers' => $headers, 'body' => $body]
+        [
+          'headers' => $webhook->getHeaders(),
+          'body' => $body,
+        ]
       );
     }
     catch (\Exception $e) {
@@ -184,16 +172,7 @@ class WebhooksService implements WebhooksServiceInterface {
   }
 
   /**
-   * Receive a webhook.
-   *
-   * @param string $name
-   *   The machine name of a webhook.
-   *
-   * @return \Drupal\webhooks\Webhook
-   *   A webhook object.
-   *
-   * @throws \Drupal\webhooks\Exception\WebhookIncomingEndpointNotFoundException
-   *   Thrown when the webhook endpoint is not found.
+   * {@inheritdoc}
    */
   public function receive($name) {
     // We only receive webhook requests when a webhook configuration exists
@@ -206,14 +185,13 @@ class WebhooksService implements WebhooksServiceInterface {
     }
 
     $request = $this->requestStack->getCurrentRequest();
-    $headers = $request->headers->all();
-    $payload = WebhooksService::decode(
+    $payload = static::decode(
       $request->getContent(),
       $request->getContentType()
     );
 
     /** @var \Drupal\webhooks\Webhook $webhook */
-    $webhook = new Webhook($payload, $headers);
+    $webhook = new Webhook($payload, $request->headers->all());
     $signature = $webhook->getSignature();
     if (!empty($signature)) {
       $webhook->verify();
@@ -239,7 +217,7 @@ class WebhooksService implements WebhooksServiceInterface {
    * @return string
    *   A string suitable for a http request.
    */
-  public static function encode($data, $content_type) {
+  protected static function encode($data, $content_type) {
     try {
       /** @var \Drupal\serialization\Encoder\JsonEncoder $encoder */
       $encoder = \Drupal::service('serializer.encoder.' . $content_type);
@@ -263,7 +241,7 @@ class WebhooksService implements WebhooksServiceInterface {
    * @return mixed
    *   A string suitable for php usage.
    */
-  public static function decode($data, $format) {
+  protected static function decode($data, $format) {
     try {
       /** @var \Drupal\serialization\Encoder\JsonEncoder $encoder */
       $encoder = \Drupal::service('serializer.encoder.' . $format);
