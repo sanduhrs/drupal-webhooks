@@ -94,7 +94,7 @@ class WebhookController extends ControllerBase {
     catch (WebhookMismatchSignatureException $e) {
       $this->loggerFactory->get('webhooks')->error(
         'Signature not matching for received Webhook @webhook: @message',
-        ['@webhook' => $webhook_config->id(), '@message' => $e->getMessage()]
+        ['@webhook' => $incoming_webhook_name, '@message' => $e->getMessage()]
       );
       return new Response(401, [], $e->getMessage());
     }

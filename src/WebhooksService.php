@@ -178,6 +178,8 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
     // We only receive webhook requests when a webhook configuration exists
     // with a matching machine name.
     $query = $this->queryFactory->get('webhook_config')
+      ->condition('id', $name)
+      ->condition('type', 'incoming')
       ->condition('status', 1);
     $ids = $query->execute();
     if (!array_key_exists($name, $ids)) {
@@ -193,7 +195,11 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
     /** @var \Drupal\webhooks\Webhook $webhook */
     $webhook = new Webhook($payload, $request->headers->all());
     $signature = $webhook->getSignature();
-    if (!empty($signature)) {
+
+    /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook_config */
+    $webhook_config = $this->entityTypeManager->getStorage('webhook_config')
+      ->load($name);
+    if ($webhook_config->getSecret()) {
       $webhook->verify();
     }
 
