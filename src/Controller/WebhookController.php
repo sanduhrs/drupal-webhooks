@@ -96,7 +96,7 @@ class WebhookController extends ControllerBase {
         'Signature not matching for received Webhook @webhook: @message',
         ['@webhook' => $webhook_config->id(), '@message' => $e->getMessage()]
       );
-      return new Response(500, [], $e->getMessage());
+      return new Response(401, [], $e->getMessage());
     }
     $this->loggerFactory->get('webhooks')->info(
       'Received a Webhook: <code><pre>@webhook</pre></code>',
