@@ -34,6 +34,7 @@ class WebhookConfigListBuilder extends ConfigEntityListBuilder {
   public function buildHeader() {
     $header['label'] = $this->t('Webhook');
     $header['id'] = $this->t('Machine name');
+    $header['type'] = $this->t('Type');
     $header['status'] = $this->t('Status');
     return $header + parent::buildHeader();
   }
@@ -55,6 +56,7 @@ class WebhookConfigListBuilder extends ConfigEntityListBuilder {
   public function buildRow(EntityInterface $entity) {
     $row['label'] = $entity->label();
     $row['id'] = $entity->id();
+    $row['type'] = ucfirst($entity->getType());
     $row['status'] = $entity->status() ? $this->t('Active') : $this->t('Inactive');
     return $row + parent::buildRow($entity);
   }
