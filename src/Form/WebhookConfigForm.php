@@ -25,7 +25,7 @@ class WebhookConfigForm extends EntityForm {
       '#title' => $this->t('Label'),
       '#maxlength' => 255,
       '#default_value' => $webhook_config->label(),
-      '#description' => $this->t("Label for the Webhook."),
+      '#description' => $this->t('Easily recognizable name for your webhook.'),
       '#required' => TRUE,
     );
     $form['id'] = array(
@@ -44,35 +44,9 @@ class WebhookConfigForm extends EntityForm {
         'outgoing' => $this->t('Outgoing'),
       ],
       '#default_value' => $webhook_config->getType() ? $webhook_config->getType() : 'outgoing',
-      '#description' => $this->t("The webhook type, e.g. incoming or outgoing."),
+      '#description' => $this->t('The type of webhook. <strong>Incoming webhooks</strong> receive HTTP events. <strong>Outgoing webhooks</strong> post new events to the configured URL.'),
       '#required' => TRUE,
-    );
-    $form['payload_url'] = array(
-      '#type' => 'textfield',
-      '#title' => $this->t('Payload URL'),
-      '#attributes' => array(
-        'placeholder' => $this->t('http://example.com/post'),
-      ),
-      '#default_value' => $webhook_config->getPayloadUrl(),
-      '#maxlength' => 255,
-      '#description' => $this->t("Target URL for your payload."),
-      '#required' => TRUE,
-    );
-    $form['secret'] = array(
-      '#type' => 'password',
-      '#attributes' => array(
-        'placeholder' => $this->t('Secret'),
-      ),
-      '#title' => $this->t('Secret'),
-      '#maxlength' => 255,
-      '#description' => $this->t("Secret that the target website gave you."),
-      '#default_value' => $webhook_config->getSecret(),
-    );
-    $form['status'] = array(
-      '#type' => 'checkbox',
-      '#title' => $this->t("Active"),
-      '#description' => $this->t("Shows if the webhook is active or not."),
-      '#default_value' => $webhook_config->isNew() ? TRUE : $webhook_config->status(),
+      '#disabled' => !$webhook_config->isNew(),
     );
     $form['content_type'] = array(
       '#type' => 'select',
@@ -82,26 +56,92 @@ class WebhookConfigForm extends EntityForm {
         'json' => $this->t('application/json'),
       ],
       '#default_value' => $webhook_config->getContentType(),
+      '#disabled' => TRUE,
     );
-    $form['events'] = array(
+
+    $form['secret'] = array(
+      '#type' => 'textfield',
+      '#attributes' => array(
+        'placeholder' => $this->t('Secret'),
+      ),
+      '#title' => $this->t('Secret'),
+      '#maxlength' => 255,
+      '#description' => $this->t('For <strong>incoming webhooks</strong> this secret is provided by the remote website. For <strong>outgoing webhooks</strong> this secret should be used for the incoming hook configuration on the remote website.'),
+      '#default_value' => $webhook_config->getSecret(),
+    );
+    $form['outgoing'] = array(
+      '#title' => $this->t('Outgoing Webhook Settings'),
+      '#type' => 'details',
+      '#collapsible' => TRUE,
+      '#collapsed' => FALSE,
+      '#states' => [
+        'expanded' => [
+          ':input[name="type"]' => ['value' => 'outgoing'],
+        ],
+        'enabled' => [
+          ':input[name="type"]' => ['value' => 'outgoing'],
+        ],
+        'required' => [
+          ':input[name="type"]' => ['value' => 'outgoing'],
+        ],
+        'collapsed' => [
+          ':input[name="type"]' => ['value' => 'incoming'],
+        ],
+        'disabled' => [
+          ':input[name="type"]' => ['value' => 'incoming'],
+        ],
+        'optional' => [
+          ':input[name="type"]' => ['value' => 'incoming'],
+        ],
+      ],
+    );
+    $form['outgoing']['payload_url'] = array(
+      '#type' => 'url',
+      '#title' => $this->t('Payload URL'),
+      '#attributes' => array(
+        'placeholder' => $this->t('http://example.com/post'),
+      ),
+      '#default_value' => $webhook_config->getPayloadUrl(),
+      '#maxlength' => 255,
+      '#description' => $this->t('Target URL for your payload. Only used on <strong>outgoing webhooks</strong>.'),
+    );
+    $form['outgoing']['events'] = array(
+      '#title' => $this->t('Enabled Events'),
       '#type' => 'tableselect',
       '#header' => array('type' => 'Entity Type' , 'event' => 'Event'),
       '#description' => $this->t("The Events you want to send to the endpoint."),
-      '#options' => [
-        'entity:user:create' => ['type' => 'User' , 'event' => 'Create'],
-        'entity:user:update' => ['type' => 'User' , 'event' => 'Update'],
-        'entity:user:delete' => ['type' => 'User' , 'event' => 'Delete'],
-        'entity:node:create' => ['type' => 'Node' , 'event' => 'Create'],
-        'entity:node:update' => ['type' => 'Node' , 'event' => 'Update'],
-        'entity:node:delete' => ['type' => 'Node' , 'event' => 'Delete'],
-        'entity:comment:create' => ['type' => 'Comment' , 'event' => 'Create'],
-        'entity:comment:update' => ['type' => 'Comment' , 'event' => 'Update'],
-        'entity:comment:delete' => ['type' => 'Comment' , 'event' => 'Delete'],
-      ],
+      '#options' => $this->eventOptions(),
+      '#default_value' => $webhook_config->isNew() ? [] : $webhook_config->getEvents(),
     );
-    $form['events']['#default_value'] = $webhook_config->isNew() ? [] : $webhook_config->getEvents();
+
+    $form['status'] = array(
+      '#type' => 'checkbox',
+      '#title' => $this->t("Active"),
+      '#description' => $this->t("Shows if the webhook is active or not."),
+      '#default_value' => $webhook_config->isNew() ? TRUE : $webhook_config->status(),
+    );
 
     return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    if ($form_state->getValue('type') == 'incoming') {
+      // payload_url is required but not used on incoming webhooks.
+      // Skipping the value entirely could break data model assumptions.
+      $form_state->setValue('payload_url', 'http://example.com/webhook');
+    }
+    elseif ($form_state->isValueEmpty('payload_url')) {
+      $form_state->setErrorByName('payload_url', $this->t('Outgoing webhooks require a Payload URL'));
+    }
+
+    if ($form_state->getValue('type') == 'outgoing' && $this->isEmptyList($form_state->getValue('events'))) {
+      $form_state->setErrorByName('events', $this->t('Outgoing webhooks require one or more events to operate.'));
+    }
+
+    parent::validateForm($form, $form_state);
   }
 
   /**
@@ -131,6 +171,54 @@ class WebhookConfigForm extends EntityForm {
     /** @var \Drupal\Core\Url $url */
     $url = $webhook_config->urlInfo('collection');
     $form_state->setRedirectUrl($url);
+  }
+
+  /**
+   * Generate a list of available events.
+   *
+   * @return array
+   *   Array of string identifiers for outgoing event options.
+   */
+  protected function eventOptions() {
+    // @todo replace hard-coded list with dynamic list of content entities.
+    $entity_types = [
+      'user',
+      'node',
+      'comment',
+    ];
+    $operations = [
+      'create',
+      'update',
+      'delete',
+    ];
+
+    $options = [];
+    foreach ($entity_types as $entity_type) {
+      foreach ($operations as $operation) {
+        $options['entity:' . $entity_type . ':' . $operation] = [
+          'type' => ucfirst($entity_type),
+          'event' => ucfirst($operation),
+        ];
+      }
+    }
+
+    return $options;
+  }
+
+  /**
+   * Identifies if an array of form values is empty.
+   *
+   * FormState::isValueEmpty() does not handle tableselect or #tree submissions.
+   *
+   * @param array $list
+   *   Array of key value pairs. keys are identifiers, values are 0 if empty or
+   *   the same value as the key if checked on.
+   *
+   * @return bool
+   *    TRUE if empty, FALSE otherwise.
+   */
+  protected function isEmptyList($list) {
+    return count(array_filter($list)) == 0;
   }
 
 }
