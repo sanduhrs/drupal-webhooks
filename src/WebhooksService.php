@@ -195,12 +195,14 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
 
     /** @var \Drupal\webhooks\Webhook $webhook */
     $webhook = new Webhook($payload, $request->headers->all());
-    $signature = $webhook->getSignature();
 
     /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook_config */
     $webhook_config = $this->entityTypeManager->getStorage('webhook_config')
       ->load($name);
-    if ($webhook_config->getSecret()) {
+
+    // Verify in both cases: the webhook_config contains a secret
+    // and/or the webhook contains a signature.
+    if ($webhook_config->getSecret() || $webhook->getSignature()) {
       $webhook->verify();
     }
 
