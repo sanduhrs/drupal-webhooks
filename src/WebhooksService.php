@@ -153,9 +153,10 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
     }
     catch (\Exception $e) {
       $this->loggerFactory->get('webhooks')->error(
-        'Could not send Webhook @webhook: @message',
+        'Could not send Webhook "@webhook": @message',
         ['@webhook' => $webhook_config->id(), '@message' => $e->getMessage()]
       );
+      $webhook->setStatus(FALSE);
     }
 
     // Dispatch Webhook Send event.
@@ -166,7 +167,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
 
     // Log the sent webhook.
     $this->loggerFactory->get('webhooks')->info(
-      'Sent a Webhook: <code><pre>@webhook</pre></code>',
+      'Completed webhook dispatch: <code><pre>@webhook</pre></code>',
       ['@webhook' => print_r($webhook, TRUE)]
     );
   }
@@ -208,6 +209,13 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
       WebhookEvents::RECEIVE,
       new ReceiveEvent($webhook)
     );
+
+    if (!$webhook->getStatus()) {
+      $this->loggerFactory->get('webhooks')->warning(
+        'Something went wrong processing webhook: <code><pre>@webhook</pre></code>',
+        ['@webhook' => print_r($webhook, TRUE)]
+      );
+    }
 
     return $webhook;
   }

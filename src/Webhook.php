@@ -55,6 +55,13 @@ class Webhook {
   protected $secret;
 
   /**
+   * Processing status.
+   *
+   * @var bool
+   */
+  protected $status;
+
+  /**
    * Webhook constructor.
    *
    * @param array $payload
@@ -79,6 +86,9 @@ class Webhook {
 
     $uuid = new Uuid();
     $this->setUuid($uuid->generate());
+
+    // Default to success.
+    $this->setStatus(TRUE);
   }
 
   /**
@@ -268,6 +278,29 @@ class Webhook {
    */
   public function setSecret($secret) {
     $this->secret = $secret;
+    return $this;
+  }
+
+  /**
+   * Retrieve the current Webhook status.
+   *
+   * @return bool
+   *   TRUE indicates no errors, FALSE indicates an error occurred.
+   */
+  public function getStatus() {
+    return $this->status;
+  }
+
+  /**
+   * Set the status.
+   *
+   * @param bool $status
+   *   New status value.
+   *
+   * @return $this
+   */
+  public function setStatus($status) {
+    $this->status = $status;
     return $this;
   }
 
