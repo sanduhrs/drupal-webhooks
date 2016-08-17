@@ -180,12 +180,7 @@ class WebhookConfigForm extends EntityForm {
    *   Array of string identifiers for outgoing event options.
    */
   protected function eventOptions() {
-    // @todo replace hard-coded list with dynamic list of content entities.
-    $entity_types = [
-      'user',
-      'node',
-      'comment',
-    ];
+    $entity_types = \Drupal::entityTypeManager()->getDefinitions();
     $operations = [
       'create',
       'update',
@@ -193,14 +188,18 @@ class WebhookConfigForm extends EntityForm {
     ];
 
     $options = [];
-    foreach ($entity_types as $entity_type) {
-      foreach ($operations as $operation) {
-        $options['entity:' . $entity_type . ':' . $operation] = [
-          'type' => ucfirst($entity_type),
-          'event' => ucfirst($operation),
-        ];
+    foreach ($entity_types as $id => $definition) {
+      if ($definition->isSubclassOf('\Drupal\Core\Entity\ContentEntityInterface')) {
+        foreach ($operations as $operation) {
+          $options['entity:' . $id . ':' . $operation] = [
+            'type' => $definition->getLabel(),
+            'event' => ucfirst($operation),
+          ];
+        }
       }
     }
+
+    \Drupal::moduleHandler()->alter('webhooks_event_info', $options);
 
     return $options;
   }
