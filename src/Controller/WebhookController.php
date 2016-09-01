@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Url;
 use Drupal\webhooks\Exception\WebhookIncomingEndpointNotFoundException;
 use Drupal\webhooks\Exception\WebhookMismatchSignatureException;
 use Drupal\webhooks\WebhooksService;
@@ -151,6 +152,16 @@ class WebhookController extends ControllerBase {
     $webhook_config = $webhooks_storage->load($id);
     $webhook_config->setStatus(!$webhook_config->status());
     $webhook_config->save();
+    drupal_set_message($this->t('Webhook <a href=":url">@webhook</a> has been %status.', [
+      ':url' => Url::fromRoute(
+        'entity.webhook_config.edit_form',
+        [
+        'webhook_config' => $webhook_config->getId(),
+        ]
+      )->toString(),
+      '@webhook' => $webhook_config->getLabel(),
+      '%status' => $webhook_config->status() ? 'enabled' : 'disabled',
+    ]));
     return $this->redirect("entity.webhook_config.collection");
   }
 
