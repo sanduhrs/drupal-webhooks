@@ -12,4 +12,5 @@ webhooks.webhook_toggle_active:
   defaults:
     _controller: '\Drupal\webhooks\Controller\WebhookController::toggleActive'
   requirements:
+    _csrf_token: 'TRUE'
     _permission: 'administer webhooks'
