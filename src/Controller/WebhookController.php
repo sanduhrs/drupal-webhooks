@@ -156,7 +156,7 @@ class WebhookController extends ControllerBase {
       ':url' => Url::fromRoute(
         'entity.webhook_config.edit_form',
         [
-        'webhook_config' => $webhook_config->getId(),
+          'webhook_config' => $webhook_config->getId(),
         ]
       )->toString(),
       '@webhook' => $webhook_config->getLabel(),
