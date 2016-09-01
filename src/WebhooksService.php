@@ -6,7 +6,9 @@ use Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Drupal\Component\Uuid\Php as Uuid;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Query\QueryFactory;
+use Drupal\Core\Link;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\webhooks\Entity\WebhookConfig;
 use Drupal\webhooks\Event\WebhookEvents;
 use Drupal\webhooks\Event\ReceiveEvent;
@@ -21,6 +23,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * @package Drupal\webhooks
  */
 class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInterface {
+
+  use StringTranslationTrait;
 
   /**
    * The Json format.
@@ -40,11 +44,11 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
   protected $client;
 
   /**
-   * The logger channel factory.
+   * Logger.
    *
-   * @var \Drupal\Core\Logger\LoggerChannelFactoryInterface
+   * @var \Psr\Log\LoggerInterface;
    */
-  protected $loggerFactory;
+  protected $logger;
 
   /**
    * The request stack.
@@ -106,7 +110,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
       EntityTypeManagerInterface $entity_type_manager
   ) {
     $this->client = $client;
-    $this->loggerFactory = $logger_factory;
+    $this->logger = $logger_factory->get('webhooks');
     $this->requestStack = $request_stack;
     $this->eventDispatcher = $event_dispatcher;
     $this->queryFactory = $query_factory;
@@ -152,9 +156,19 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
       );
     }
     catch (\Exception $e) {
-      $this->loggerFactory->get('webhooks')->error(
-        'Could not send Webhook "@webhook": @message',
-        ['@webhook' => $webhook_config->id(), '@message' => $e->getMessage()]
+      $this->logger->error(
+        'Dispatch Failed. Subscriber %subscriber on Webhook %uuid for Event %event: @message', [
+          '%subscriber' => $webhook_config->id(),
+          '%uuid' => $webhook->getUuid(),
+          '%event' => $webhook->getEvent(),
+          '@message' => $e->getMessage(),
+          'link' => Link::createFromRoute(
+            $this->t('Edit Webhook'),
+            'entity.webhook_config.edit_form', [
+              'webhook_config' => $webhook_config->id(),
+            ]
+          )->toString(),
+        ]
       );
       $webhook->setStatus(FALSE);
     }
@@ -166,9 +180,19 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
     );
 
     // Log the sent webhook.
-    $this->loggerFactory->get('webhooks')->info(
-      'Completed webhook dispatch: <code><pre>@webhook</pre></code>',
-      ['@webhook' => print_r($webhook, TRUE)]
+    $this->logger->info(
+      'Webhook Dispatched. Subscriber %subscriber on Webhook %uuid for Event %event. Payload: @payload', [
+        '%subscriber' => $webhook_config->id(),
+        '%uuid' => $webhook->getUuid(),
+        '%event' => $webhook->getEvent(),
+        '@payload' => json_encode($webhook->getPayload()),
+        'link' => Link::createFromRoute(
+          $this->t('Edit Webhook'),
+          'entity.webhook_config.edit_form', [
+            'webhook_config' => $webhook_config->id(),
+          ]
+        )->toString(),
+      ]
     );
   }
 
@@ -213,9 +237,19 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
     );
 
     if (!$webhook->getStatus()) {
-      $this->loggerFactory->get('webhooks')->warning(
-        'Something went wrong processing webhook: <code><pre>@webhook</pre></code>',
-        ['@webhook' => print_r($webhook, TRUE)]
+      $this->logger->warning(
+        'Processing Failure. Subscriber %subscriber on Webhook %uuid for Event %event. Payload: @webhook', [
+          '%subscriber' => $webhook_config->id(),
+          '%uuid' => $webhook->getUuid(),
+          '%event' => $webhook->getEvent(),
+          '@payload' => json_encode($webhook->getPayload()),
+          'link' => Link::createFromRoute(
+            $this->t('Edit Webhook'),
+            'entity.webhook_config.edit_form', [
+              'webhook_config' => $webhook_config->id(),
+            ]
+          )->toString(),
+        ]
       );
     }
 

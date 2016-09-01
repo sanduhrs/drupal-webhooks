@@ -5,6 +5,7 @@ namespace Drupal\webhooks\Controller;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Link;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\webhooks\Exception\WebhookIncomingEndpointNotFoundException;
@@ -93,14 +94,31 @@ class WebhookController extends ControllerBase {
     }
     catch (WebhookMismatchSignatureException $e) {
       $this->loggerFactory->get('webhooks')->error(
-        'Signature not matching for received Webhook @webhook: @message',
-        ['@webhook' => $incoming_webhook_name, '@message' => $e->getMessage()]
+        'Unauthorized. Signature mismatch for Webhook Subscriber %name: @message',
+        [
+          '%name' => $incoming_webhook_name,
+          '@message' => $e->getMessage(),
+          'link' => Link::createFromRoute(
+            $this->t('Edit Webhook'),
+            'entity.webhook_config.edit_form', [
+              'webhook_config' => $incoming_webhook_name,
+            ]
+          )->toString(),
+        ]
       );
       return new Response(401, [], $e->getMessage());
     }
     $this->loggerFactory->get('webhooks')->info(
-      'Received a Webhook: <code><pre>@webhook</pre></code>',
-      ['@webhook' => print_r($webhook, TRUE)]
+      'Received a Webhook: %name',
+      [
+        '%name' => $incoming_webhook_name,
+        'link' => Link::createFromRoute(
+          $this->t('Edit Webhook'),
+          'entity.webhook_config.edit_form', [
+            'webhook_config' => $incoming_webhook_name,
+          ]
+        )->toString(),
+      ]
     );
     return new Response(200, [], 'OK');
   }
