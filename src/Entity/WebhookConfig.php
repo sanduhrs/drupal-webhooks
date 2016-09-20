@@ -243,7 +243,9 @@ class WebhookConfig extends ConfigEntityBase implements WebhookConfigInterface {
    */
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
-    $this->events = serialize($this->events);
+    $this->events = serialize(
+      array_filter($this->events)
+    );
   }
 
 }
