@@ -15,6 +15,7 @@ use Drupal\webhooks\Exception\WebhookIncomingEndpointNotFoundException;
 use GuzzleHttp\Client;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Class WebhookService.
@@ -201,7 +202,6 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
       $request->getContentType()
     );
 
-    /** @var \Drupal\webhooks\Webhook $webhook */
     $webhook = new Webhook($payload, $request->headers->all());
 
     /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook_config */
@@ -253,11 +253,9 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
    */
   protected static function encode(array $data, $content_type) {
     try {
-      /** @var \Drupal\serialization\Encoder\JsonEncoder $encoder */
-      $encoder = \Drupal::service('serializer.encoder.' . $content_type);
-      if (!empty($encoder) && $encoder->supportsEncoding($content_type)) {
-        return $encoder->encode($data, $content_type);
-      }
+      $serializer = \Drupal::service('serializer');
+      \assert($serializer instanceof SerializerInterface);
+      return $serializer->serialize($data, $content_type);
     }
     catch (\Exception $e) {
     }
@@ -277,11 +275,9 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
    */
   protected static function decode(array $data, $format) {
     try {
-      /** @var \Drupal\serialization\Encoder\JsonEncoder $encoder */
-      $encoder = \Drupal::service('serializer.encoder.' . $format);
-      if (!empty($encoder) && $encoder->supportsDecoding($format)) {
-        return $encoder->decode($data, $format);
-      }
+      $serializer = \Drupal::service('serializer');
+      \assert($serializer instanceof SerializerInterface);
+      return $serializer->deserialize($data, $format);
     }
     catch (\Exception $e) {
     }
