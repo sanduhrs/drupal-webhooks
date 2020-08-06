@@ -5,7 +5,6 @@ namespace Drupal\webhooks;
 use Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Drupal\Component\Uuid\Php as Uuid;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\Link;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -44,9 +43,9 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
   protected $client;
 
   /**
-   * Logger.
+   * The Logger.
    *
-   * @var \Psr\Log\LoggerInterface;
+   * @var \Psr\Log\LoggerInterface
    */
   protected $logger;
 
@@ -58,13 +57,6 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
   protected $requestStack;
 
   /**
-   * The webhook container object.
-   *
-   * @var \Drupal\webhooks\Webhook
-   */
-  protected $webhook;
-
-  /**
    * The event dispatcher.
    *
    * @var \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher
@@ -72,61 +64,53 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
   protected $eventDispatcher;
 
   /**
-   * The query factory.
+   * The webhook storage.
    *
-   * @var \Drupal\Core\Entity\Query\QueryFactory
+   * @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface
    */
-  protected $queryFactory;
+  protected $webhookStorage;
 
   /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * WebhookService constructor.
+   * WebhooksService constructor.
    *
    * @param \GuzzleHttp\Client $client
-   *   A http client.
+   *   The http client.
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
-   *   A logger channel factory.
+   *   The logger channel factory.
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
    *   The current request stack.
    * @param \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher $event_dispatcher
    *   The event dispatcher.
-   * @param \Drupal\Core\Entity\Query\QueryFactory $query_factory
-   *   The query factory.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function __construct(
       Client $client,
       LoggerChannelFactoryInterface $logger_factory,
       RequestStack $request_stack,
       ContainerAwareEventDispatcher $event_dispatcher,
-      QueryFactory $query_factory,
       EntityTypeManagerInterface $entity_type_manager
   ) {
     $this->client = $client;
     $this->logger = $logger_factory->get('webhooks');
     $this->requestStack = $request_stack;
     $this->eventDispatcher = $event_dispatcher;
-    $this->queryFactory = $query_factory;
-    $this->entityTypeManager = $entity_type_manager;
+    $this->webhookStorage = $entity_type_manager->getStorage('webhook_config');
   }
 
   /**
    * {@inheritdoc}
    */
   public function loadMultipleByEvent($event, $type = 'outgoing') {
-    $query = $this->queryFactory->get('webhook_config')
+    $query = $this->webhookStorage->getQuery()
       ->condition('status', 1)
       ->condition('events', $event, 'CONTAINS')
       ->condition('type', $type, '=');
     $ids = $query->execute();
-    return $this->entityTypeManager->getStorage('webhook_config')
+    return $this->webhookStorage
       ->loadMultiple($ids);
   }
 
@@ -202,7 +186,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
   public function receive($name) {
     // We only receive webhook requests when a webhook configuration exists
     // with a matching machine name.
-    $query = $this->queryFactory->get('webhook_config')
+    $query = $this->webhookStorage->getQuery()
       ->condition('id', $name)
       ->condition('type', 'incoming')
       ->condition('status', 1);
@@ -221,7 +205,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
     $webhook = new Webhook($payload, $request->headers->all());
 
     /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook_config */
-    $webhook_config = $this->entityTypeManager->getStorage('webhook_config')
+    $webhook_config = $this->webhookStorage
       ->load($name);
 
     // Verify in both cases: the webhook_config contains a secret
@@ -267,7 +251,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
    * @return string
    *   A string suitable for a http request.
    */
-  protected static function encode($data, $content_type) {
+  protected static function encode(array $data, $content_type) {
     try {
       /** @var \Drupal\serialization\Encoder\JsonEncoder $encoder */
       $encoder = \Drupal::service('serializer.encoder.' . $content_type);
@@ -291,7 +275,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
    * @return mixed
    *   A string suitable for php usage.
    */
-  protected static function decode($data, $format) {
+  protected static function decode(array $data, $format) {
     try {
       /** @var \Drupal\serialization\Encoder\JsonEncoder $encoder */
       $encoder = \Drupal::service('serializer.encoder.' . $format);
