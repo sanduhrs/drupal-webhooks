@@ -74,8 +74,8 @@ class Webhook {
    *   The content type of the payload.
    */
   public function __construct(
-      $payload = [],
-      $headers = [],
+      array $payload = [],
+      array $headers = [],
       $event = 'default',
       $content_type = 'json'
   ) {
@@ -110,7 +110,7 @@ class Webhook {
    * @return Webhook
    *   The webhook.
    */
-  public function setHeaders($headers) {
+  public function setHeaders(array $headers) {
     // RequestStack returns the Header-Value as an array.
     foreach ($headers as $key => $value) {
       if (is_array($value)) {
@@ -130,7 +130,7 @@ class Webhook {
    * @return Webhook
    *   The webhook.
    */
-  public function addHeaders($headers) {
+  public function addHeaders(array $headers) {
     $this->headers = array_merge(
       $this->headers,
       $headers
@@ -157,7 +157,7 @@ class Webhook {
    * @return Webhook
    *   The webhook.
    */
-  public function setPayload($payload) {
+  public function setPayload(array $payload) {
     $this->payload = $payload;
     $this->setSecret($this->secret);
     return $this;
@@ -172,7 +172,7 @@ class Webhook {
    * @return Webhook
    *   The webhook.
    */
-  public function addPayload($payload) {
+  public function addPayload(array $payload) {
     $this->payload = array_merge(
       $this->payload,
       $payload
@@ -339,7 +339,7 @@ class Webhook {
    * @return bool
    *   Boolean TRUE for success, FALSE otherwise.
    *
-   * @throws WebhookMismatchSignatureException
+   * @throws \Drupal\webhooks\Exception\WebhookMismatchSignatureException
    *   Throws exception if signatures do not match.
    */
   public function verify() {

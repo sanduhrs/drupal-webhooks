@@ -85,7 +85,7 @@ class WebhookConfig extends ConfigEntityBase implements WebhookConfigInterface {
   /**
    * The Webhook last usage.
    *
-   * @var integer
+   * @var int
    */
   protected $last_usage;
 

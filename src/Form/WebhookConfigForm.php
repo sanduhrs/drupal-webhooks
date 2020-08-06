@@ -20,23 +20,23 @@ class WebhookConfigForm extends EntityForm {
 
     /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook_config */
     $webhook_config = $this->entity;
-    $form['label'] = array(
+    $form['label'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Label'),
       '#maxlength' => 255,
       '#default_value' => $webhook_config->label(),
       '#description' => $this->t('Easily recognizable name for your webhook.'),
       '#required' => TRUE,
-    );
-    $form['id'] = array(
+    ];
+    $form['id'] = [
       '#type' => 'machine_name',
       '#default_value' => $webhook_config->id(),
-      '#machine_name' => array(
+      '#machine_name' => [
         'exists' => '\Drupal\webhooks\Entity\WebhookConfig::load',
-      ),
+      ],
       '#disabled' => !$webhook_config->isNew(),
-    );
-    $form['type'] = array(
+    ];
+    $form['type'] = [
       '#type' => 'select',
       '#title' => $this->t('Type'),
       '#options' => [
@@ -47,8 +47,8 @@ class WebhookConfigForm extends EntityForm {
       '#description' => $this->t('The type of webhook. <strong>Incoming webhooks</strong> receive HTTP events. <strong>Outgoing webhooks</strong> post new events to the configured URL.'),
       '#required' => TRUE,
       '#disabled' => !$webhook_config->isNew(),
-    );
-    $form['content_type'] = array(
+    ];
+    $form['content_type'] = [
       '#type' => 'select',
       '#title' => $this->t("Content Type"),
       '#description' => $this->t("The Content Type of your webhook."),
@@ -57,19 +57,19 @@ class WebhookConfigForm extends EntityForm {
       ],
       '#default_value' => $webhook_config->getContentType(),
       '#disabled' => TRUE,
-    );
+    ];
 
-    $form['secret'] = array(
+    $form['secret'] = [
       '#type' => 'textfield',
-      '#attributes' => array(
+      '#attributes' => [
         'placeholder' => $this->t('Secret'),
-      ),
+      ],
       '#title' => $this->t('Secret'),
       '#maxlength' => 255,
       '#description' => $this->t('For <strong>incoming webhooks</strong> this secret is provided by the remote website. For <strong>outgoing webhooks</strong> this secret should be used for the incoming hook configuration on the remote website.'),
       '#default_value' => $webhook_config->getSecret(),
-    );
-    $form['outgoing'] = array(
+    ];
+    $form['outgoing'] = [
       '#title' => $this->t('Outgoing Webhook Settings'),
       '#type' => 'details',
       '#collapsible' => TRUE,
@@ -94,32 +94,32 @@ class WebhookConfigForm extends EntityForm {
           ':input[name="type"]' => ['value' => 'incoming'],
         ],
       ],
-    );
-    $form['outgoing']['payload_url'] = array(
+    ];
+    $form['outgoing']['payload_url'] = [
       '#type' => 'url',
       '#title' => $this->t('Payload URL'),
-      '#attributes' => array(
+      '#attributes' => [
         'placeholder' => $this->t('http://example.com/post'),
-      ),
+      ],
       '#default_value' => $webhook_config->getPayloadUrl(),
       '#maxlength' => 255,
       '#description' => $this->t('Target URL for your payload. Only used on <strong>outgoing webhooks</strong>.'),
-    );
-    $form['outgoing']['events'] = array(
+    ];
+    $form['outgoing']['events'] = [
       '#title' => $this->t('Enabled Events'),
       '#type' => 'tableselect',
-      '#header' => array('type' => 'Entity Type' , 'event' => 'Event'),
+      '#header' => ['type' => 'Entity Type' , 'event' => 'Event'],
       '#description' => $this->t("The Events you want to send to the endpoint."),
       '#options' => $this->eventOptions(),
       '#default_value' => $webhook_config->isNew() ? [] : $webhook_config->getEvents(),
-    );
+    ];
 
-    $form['status'] = array(
+    $form['status'] = [
       '#type' => 'checkbox',
       '#title' => $this->t("Active"),
       '#description' => $this->t("Shows if the webhook is active or not."),
       '#default_value' => $webhook_config->isNew() ? TRUE : $webhook_config->status(),
-    );
+    ];
 
     return $form;
   }
@@ -195,7 +195,7 @@ class WebhookConfigForm extends EntityForm {
 
     $options = [];
     foreach ($entity_types as $id => $definition) {
-      if ($definition->isSubclassOf('\Drupal\Core\Entity\ContentEntityInterface')) {
+      if ($definition->entityClassImplements('\Drupal\Core\Entity\ContentEntityInterface')) {
         foreach ($operations as $operation) {
           $options['entity:' . $id . ':' . $operation] = [
             'type' => $definition->getLabel(),
@@ -220,9 +220,9 @@ class WebhookConfigForm extends EntityForm {
    *   the same value as the key if checked on.
    *
    * @return bool
-   *    TRUE if empty, FALSE otherwise.
+   *   TRUE if empty, FALSE otherwise.
    */
-  protected function isEmptyList($list) {
+  protected function isEmptyList(array $list) {
     return count(array_filter($list)) == 0;
   }
 

@@ -8,9 +8,6 @@ use Symfony\Component\Routing\Route;
 
 /**
  * Provides routes for Webhook entities.
- *
- * @see Drupal\Core\Entity\Routing\AdminHtmlRouteProvider
- * @see Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider
  */
 class WebhookConfigHtmlRouteProvider extends AdminHtmlRouteProvider {
 
@@ -35,7 +32,7 @@ class WebhookConfigHtmlRouteProvider extends AdminHtmlRouteProvider {
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type.
    *
-   * @return \Symfony\Component\Routing\Route|null
+   * @return \Symfony\Component\Routing\Route|void
    *   The generated route, if available.
    */
   protected function getCollectionRoute(EntityTypeInterface $entity_type) {

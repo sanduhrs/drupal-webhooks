@@ -16,14 +16,16 @@ class WebhookConfigListBuilder extends ConfigEntityListBuilder {
    */
   public function getOperations(EntityInterface $entity) {
     $operations = parent::getOperations($entity);
-    $operations['toggle_active'] = array(
+    $operations['toggle_active'] = [
       'title' => $entity->status() ? t('Deactivate') : t('Activate'),
       'weight' => 50,
       'url' => Url::fromRoute(
         'webhooks.webhook_toggle_active',
-        array('id' => $entity->id())
+        [
+          'id' => $entity->id(),
+        ]
       ),
-    );
+    ];
     uasort($operations, '\Drupal\Component\Utility\SortArray::sortByWeightElement');
     return $operations;
   }
@@ -32,33 +34,34 @@ class WebhookConfigListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header['label'] = $this->t('Webhook');
-    $header['id'] = $this->t('Machine name');
-    $header['type'] = $this->t('Type');
-    $header['status'] = $this->t('Status');
-    return $header + parent::buildHeader();
+    return [
+      'label' => $this->t('Webhook'),
+      'id' => $this->t('Machine name'),
+      'type' => $this->t('Type'),
+      'status' => $this->t('Status'),
+    ] + parent::buildHeader();
   }
 
   /**
    * {@inheritdoc}
    */
   public function buildOperations(EntityInterface $entity) {
-    $build = array(
+    return [
       '#type' => 'operations',
       '#links' => $this->getOperations($entity),
-    );
-    return $build;
+    ];
   }
 
   /**
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-    $row['label'] = $entity->label();
-    $row['id'] = $entity->id();
-    $row['type'] = ucfirst($entity->getType());
-    $row['status'] = $entity->status() ? $this->t('Active') : $this->t('Inactive');
-    return $row + parent::buildRow($entity);
+    return [
+      'label' => $entity->label(),
+      'id' => $entity->id(),
+      'type' => ucfirst($entity->getType()),
+      'status' => $entity->status() ? $this->t('Active') : $this->t('Inactive'),
+    ] + parent::buildRow($entity);
   }
 
 }
