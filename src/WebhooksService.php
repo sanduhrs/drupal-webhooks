@@ -2,7 +2,6 @@
 
 namespace Drupal\webhooks;
 
-use Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Drupal\Component\Uuid\Php as Uuid;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Link;
@@ -14,6 +13,7 @@ use Drupal\webhooks\Event\ReceiveEvent;
 use Drupal\webhooks\Event\SendEvent;
 use Drupal\webhooks\Exception\WebhookIncomingEndpointNotFoundException;
 use GuzzleHttp\Client;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -59,7 +59,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
   /**
    * The event dispatcher.
    *
-   * @var \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
    */
   protected $eventDispatcher;
 
@@ -79,7 +79,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
    *   The logger channel factory.
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
    *   The current request stack.
-   * @param \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher $event_dispatcher
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
@@ -91,7 +91,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
       Client $client,
       LoggerChannelFactoryInterface $logger_factory,
       RequestStack $request_stack,
-      ContainerAwareEventDispatcher $event_dispatcher,
+      EventDispatcherInterface $event_dispatcher,
       EntityTypeManagerInterface $entity_type_manager
   ) {
     $this->client = $client;
