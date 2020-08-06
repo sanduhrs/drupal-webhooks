@@ -158,18 +158,24 @@ class WebhookConfigForm extends EntityForm {
 
     switch ($active) {
       case SAVED_NEW:
-        drupal_set_message($this->t('Created the %label Webhook.', [
-          '%label' => $webhook_config->label(),
-        ]));
+        $this->messenger()->addStatus($this->t(
+          'Created the %label Webhook.',
+          [
+            '%label' => $webhook_config->label(),
+          ]
+        ));
         break;
 
       default:
-        drupal_set_message($this->t('Saved the %label Webhook.', [
-          '%label' => $webhook_config->label(),
-        ]));
+        $this->messenger()->addStatus($this->t(
+          'Saved the %label Webhook.',
+          [
+            '%label' => $webhook_config->label(),
+          ]
+        ));
     }
     /** @var \Drupal\Core\Url $url */
-    $url = $webhook_config->urlInfo('collection');
+    $url = $webhook_config->toUrl('collection');
     $form_state->setRedirectUrl($url);
   }
 

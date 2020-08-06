@@ -7,6 +7,7 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\webhooks\Exception\WebhookIncomingEndpointNotFoundException;
@@ -37,30 +38,37 @@ class WebhookController extends ControllerBase {
   protected $entityTypeManager;
 
   /**
-   * The logger channel factory.
+   * The Logger.
    *
-   * @var \Drupal\Core\Logger\LoggerChannelFactoryInterface
+   * @var \Psr\Log\LoggerInterface
    */
-  protected $loggerFactory;
+  protected $logger;
+
+  /**
+   * The messenger.
+   *
+   * @var MessengerInterface
+   */
+  protected $messenger;
 
   /**
    * WebhookController constructor.
    *
    * @param \Drupal\webhooks\WebhooksService $webhooks_service
-   *   The Webhooks service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
-   *   A logger channel factory.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    */
   public function __construct(
       WebhooksService $webhooks_service,
       EntityTypeManagerInterface $entity_type_manager,
-      LoggerChannelFactoryInterface $logger_factory
+      LoggerChannelFactoryInterface $logger_factory,
+      MessengerInterface $messenger
   ) {
     $this->webhooksService = $webhooks_service;
     $this->entityTypeManager = $entity_type_manager;
-    $this->loggerFactory = $logger_factory;
+    $this->logger = $logger_factory->get('webhooks');
+    $this->messenger = $messenger;
   }
 
   /**
@@ -70,7 +78,8 @@ class WebhookController extends ControllerBase {
     return new static(
       $container->get('webhooks.service'),
       $container->get('entity_type.manager'),
-      $container->get('logger.factory')
+      $container->get('logger.factory'),
+      $container->get('messenger')
     );
   }
 
@@ -88,13 +97,11 @@ class WebhookController extends ControllerBase {
       $this->webhooksService->receive($incoming_webhook_name);
     }
     catch (WebhookIncomingEndpointNotFoundException $e) {
-      $this->loggerFactory->get('webhooks')->error(
-        $e->getMessage()
-      );
+      $this->logger->error($e->getMessage());
       return new Response(404, [], $e->getMessage());
     }
     catch (WebhookMismatchSignatureException $e) {
-      $this->loggerFactory->get('webhooks')->error(
+      $this->logger->error(
         'Unauthorized. Signature mismatch for Webhook Subscriber %name: @message',
         [
           '%name' => $incoming_webhook_name,
@@ -109,7 +116,7 @@ class WebhookController extends ControllerBase {
       );
       return new Response(401, [], $e->getMessage());
     }
-    $this->loggerFactory->get('webhooks')->info(
+    $this->logger->info(
       'Received a Webhook: %name',
       [
         '%name' => $incoming_webhook_name,
@@ -141,10 +148,14 @@ class WebhookController extends ControllerBase {
    * Toggle the active state.
    *
    * @param mixed $id
-   *    The id of the entity given by route url.
+   *   The id of the entity given by route url.
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
    *   A redirect response object that may be returned by the controller.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public function toggleActive($id) {
     $webhooks_storage = $this->entityTypeManager->getStorage('webhook_config');
@@ -152,16 +163,20 @@ class WebhookController extends ControllerBase {
     $webhook_config = $webhooks_storage->load($id);
     $webhook_config->setStatus(!$webhook_config->status());
     $webhook_config->save();
-    drupal_set_message($this->t('Webhook <a href=":url">@webhook</a> has been %status.', [
-      ':url' => Url::fromRoute(
-        'entity.webhook_config.edit_form',
-        [
-          'webhook_config' => $webhook_config->getId(),
-        ]
-      )->toString(),
-      '@webhook' => $webhook_config->getLabel(),
-      '%status' => $webhook_config->status() ? 'enabled' : 'disabled',
-    ]));
+
+    $this->messenger()->addStatus($this->t(
+      'Webhook <a href=":url">@webhook</a> has been %status.',
+      [
+        ':url' => Url::fromRoute(
+          'entity.webhook_config.edit_form',
+          [
+            'webhook_config' => $webhook_config->getId(),
+          ]
+        )->toString(),
+        '@webhook' => $webhook_config->getLabel(),
+        '%status' => $webhook_config->status() ? 'enabled' : 'disabled',
+      ]
+    ));
     return $this->redirect("entity.webhook_config.collection");
   }
 
