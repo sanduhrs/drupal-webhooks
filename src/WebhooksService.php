@@ -281,7 +281,8 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
     }
     catch (\Exception $e) {
     }
-    return '';
+    return $data;
+
   }
 
 }
