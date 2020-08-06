@@ -47,7 +47,7 @@ class WebhookController extends ControllerBase {
   /**
    * The messenger.
    *
-   * @var MessengerInterface
+   * @var \Drupal\Core\Messenger\MessengerInterface
    */
   protected $messenger;
 
@@ -55,9 +55,13 @@ class WebhookController extends ControllerBase {
    * WebhookController constructor.
    *
    * @param \Drupal\webhooks\WebhooksService $webhooks_service
+   *   The webhooks service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
+   *   The logger channel factory.
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger.
    */
   public function __construct(
       WebhooksService $webhooks_service,

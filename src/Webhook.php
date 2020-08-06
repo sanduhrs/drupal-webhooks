@@ -20,6 +20,13 @@ class Webhook {
   protected $headers;
 
   /**
+   * The webhook raw payload, for verification.
+   *
+   * @var array
+   */
+  protected $rawPayload;
+
+  /**
    * The webhook payload.
    *
    * @var array
@@ -68,6 +75,8 @@ class Webhook {
    *   The payload that is being send with the webhook.
    * @param array $headers
    *   The headers that are being send with the webhook.
+   * @param string $rawPayload
+   *   The raw payload that is being send with the webhook.
    * @param string $event
    *   The event that is acted upon.
    * @param string $content_type
@@ -76,11 +85,12 @@ class Webhook {
   public function __construct(
       array $payload = [],
       array $headers = [],
+      $rawPayload = '',
       $event = 'default',
       $content_type = 'json'
   ) {
     $this->setHeaders($headers);
-    $this->setPayload($payload);
+    $this->setPayload($payload, $rawPayload);
     $this->setEvent($event);
     $this->setContentType($content_type);
 
@@ -153,12 +163,15 @@ class Webhook {
    *
    * @param array $payload
    *   A payload array.
+   * @param string $raw
+   *   A raw payload string.
    *
    * @return Webhook
    *   The webhook.
    */
-  public function setPayload(array $payload) {
+  public function setPayload(array $payload, $raw) {
     $this->payload = $payload;
+    $this->rawPayload = $raw;
     $this->setSecret($this->secret);
     return $this;
   }
@@ -342,15 +355,16 @@ class Webhook {
    * @throws \Drupal\webhooks\Exception\WebhookMismatchSignatureException
    *   Throws exception if signatures do not match.
    */
-  public function verify() {
+  public function verify($secret) {
     list($algorithm, $user_string) = explode('=', $this->getSignature());
     $known_string = hash_hmac(
       $algorithm,
       json_encode($this->payload),
-      $this->secret
+      $this->rawPayload,
+      $secret
     );
     if (!hash_equals($known_string, $user_string)) {
-      throw new WebhookMismatchSignatureException($user_string, $known_string);
+      throw new WebhookMismatchSignatureException($user_string, $algorithm . '=' . $known_string, $this->rawPayload);
     }
     return TRUE;
   }

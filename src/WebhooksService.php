@@ -202,7 +202,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
       $request->getContentType()
     );
 
-    $webhook = new Webhook($payload, $request->headers->all());
+    $webhook = new Webhook($payload, $request->headers->all(), $request->getContent());
 
     /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook_config */
     $webhook_config = $this->webhookStorage
@@ -211,7 +211,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
     // Verify in both cases: the webhook_config contains a secret
     // and/or the webhook contains a signature.
     if ($webhook_config->getSecret() || $webhook->getSignature()) {
-      $webhook->verify();
+      $webhook->verify($webhook_config->getSecret());
     }
 
     // Dispatch Webhook Receive event.

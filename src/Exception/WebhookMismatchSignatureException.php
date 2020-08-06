@@ -16,12 +16,15 @@ class WebhookMismatchSignatureException extends \Exception {
    *   The received signature.
    * @param string $signature_generated
    *   The generated signature.
+   * @param string $payload
+   *   The webhook payload.
    */
-  public function __construct($signature_received, $signature_generated) {
+  public function __construct($signature_received, $signature_generated, $payload = '') {
     $message = sprintf(
-      'The received signature does not match the generated signature.',
+      'The received signature "%s" does not match the generated signature "%s". Payload: "%s"',
       $signature_received,
-      $signature_generated
+      $signature_generated,
+      $payload
     );
     parent::__construct($message);
   }
