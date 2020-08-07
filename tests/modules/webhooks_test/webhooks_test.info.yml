@@ -1,0 +1,9 @@
+name: Webhooks Test
+type: module
+description: The webhooks test module.
+package: Webhooks
+core: 8.x
+core_version_requirement: ^8 || ^9
+dependencies:
+  - webhooks
+hidden: true
