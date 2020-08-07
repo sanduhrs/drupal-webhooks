@@ -23,6 +23,17 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     },
  *   },
  *   config_prefix = "webhook",
+ *   config_export = {
+ *     "id",
+ *     "label",
+ *     "payload_url",
+ *     "type",
+ *     "events",
+ *     "content_type",
+ *     "ref_entity_type",
+ *     "ref_entity_id",
+ *     "secret"
+ *   },
  *   admin_permission = "administer webhooks",
  *   entity_keys = {
  *     "id" = "id",
