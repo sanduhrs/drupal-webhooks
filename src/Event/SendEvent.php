@@ -39,8 +39,8 @@ class SendEvent extends Event {
       WebhookConfig $webhook_config,
       Webhook $webhook
   ) {
-    $this->webhook = $webhook;
     $this->webhookConfig = $webhook_config;
+    $this->webhook = $webhook;
   }
 
   /**

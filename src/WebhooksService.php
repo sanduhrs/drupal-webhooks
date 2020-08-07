@@ -15,8 +15,6 @@ use Drupal\webhooks\Exception\WebhookIncomingEndpointNotFoundException;
 use GuzzleHttp\Client;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Serializer\Encoder\DecoderInterface;
-use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -244,7 +242,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
     // Dispatch Webhook Receive event.
     $this->eventDispatcher->dispatch(
       WebhookEvents::RECEIVE,
-      new ReceiveEvent($webhook)
+      new ReceiveEvent($webhook_config, $webhook)
     );
 
     if (!$webhook->getStatus()) {

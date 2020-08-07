@@ -22,7 +22,7 @@ class Webhook {
   /**
    * The webhook raw payload, for verification.
    *
-   * @var array
+   * @var string
    */
   protected $rawPayload;
 

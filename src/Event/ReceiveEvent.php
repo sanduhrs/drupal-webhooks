@@ -2,6 +2,7 @@
 
 namespace Drupal\webhooks\Event;
 
+use Drupal\webhooks\Entity\WebhookConfig;
 use Drupal\webhooks\Webhook;
 use Symfony\Component\EventDispatcher\Event;
 
@@ -20,12 +21,25 @@ class ReceiveEvent extends Event {
   protected $webhook;
 
   /**
-   * ReceiveEvent constructor.
+   * The webhook configuration.
    *
+   * @var \Drupal\webhooks\Entity\WebhookConfig
+   */
+  protected $webhookConfig;
+
+  /**
+   * SendEvent constructor.
+   *
+   * @param \Drupal\webhooks\Entity\WebhookConfig $webhook_config
+   *   A webhook configuration entity.
    * @param \Drupal\webhooks\Webhook $webhook
    *   A webhook.
    */
-  public function __construct(Webhook $webhook) {
+  public function __construct(
+      WebhookConfig $webhook_config,
+      Webhook $webhook
+  ) {
+    $this->webhookConfig = $webhook_config;
     $this->webhook = $webhook;
   }
 
@@ -37,6 +51,16 @@ class ReceiveEvent extends Event {
    */
   public function getWebhook() {
     return $this->webhook;
+  }
+
+  /**
+   * Get the webhook configuration.
+   *
+   * @return \Drupal\webhooks\Entity\WebhookConfig
+   *   A webhook configuration.
+   */
+  public function getWebhookConfig() {
+    return $this->webhookConfig;
   }
 
 }
