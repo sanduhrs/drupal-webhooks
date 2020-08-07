@@ -15,6 +15,8 @@ use Drupal\webhooks\Exception\WebhookIncomingEndpointNotFoundException;
 use GuzzleHttp\Client;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Serializer\Encoder\DecoderInterface;
+use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -72,6 +74,27 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
   protected $webhookStorage;
 
   /**
+   * The serializer.
+   *
+   * @var \Symfony\Component\Serializer\SerializerInterface
+   */
+  protected $serializer;
+
+  /**
+   * The decoder.
+   *
+   * @var \Symfony\Component\Serializer\Encoder\DecoderInterface
+   */
+  protected $decoder;
+
+  /**
+   * The encoder.
+   *
+   * @var \Symfony\Component\Serializer\Encoder\EncoderInterface
+   */
+  protected $encoder;
+
+  /**
    * WebhooksService constructor.
    *
    * @param \GuzzleHttp\Client $client
@@ -84,6 +107,8 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
    *   The event dispatcher.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Symfony\Component\Serializer\SerializerInterface $serializer
+   *   The serializer.
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
@@ -93,13 +118,17 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
       LoggerChannelFactoryInterface $logger_factory,
       RequestStack $request_stack,
       EventDispatcherInterface $event_dispatcher,
-      EntityTypeManagerInterface $entity_type_manager
+      EntityTypeManagerInterface $entity_type_manager,
+      SerializerInterface $serializer
   ) {
     $this->client = $client;
     $this->logger = $logger_factory->get('webhooks');
     $this->requestStack = $request_stack;
     $this->eventDispatcher = $event_dispatcher;
     $this->webhookStorage = $entity_type_manager->getStorage('webhook_config');
+    $this->serializer = $serializer;
+    $this->decoder = $serializer;
+    $this->encoder = $serializer;
   }
 
   /**
@@ -126,9 +155,9 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
       $webhook->setSignature();
     }
 
-    $body = static::encode(
+    $body = $this->encode(
       $webhook->getPayload(),
-      $webhook_config->getContentType()
+      $webhook->getContentType()
     );
 
     try {
@@ -170,7 +199,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
         '%subscriber' => $webhook_config->id(),
         '%uuid' => $webhook->getUuid(),
         '%event' => $webhook->getEvent(),
-        '@payload' => json_encode($webhook->getPayload()),
+        '@payload' => $this->encode($webhook->getPayload(), $webhook->getContentType()),
         'link' => Link::createFromRoute(
           $this->t('Edit Webhook'),
           'entity.webhook_config.edit_form', [
@@ -197,7 +226,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
     }
 
     $request = $this->requestStack->getCurrentRequest();
-    $payload = static::decode(
+    $payload = $this->decode(
       $request->getContent(),
       $request->getContentType()
     );
@@ -222,11 +251,11 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
 
     if (!$webhook->getStatus()) {
       $this->logger->warning(
-        'Processing Failure. Subscriber %subscriber on Webhook %uuid for Event %event. Payload: @webhook', [
+        'Processing Failure. Subscriber %subscriber on Webhook %uuid for Event %event. Payload: @payload', [
           '%subscriber' => $webhook_config->id(),
           '%uuid' => $webhook->getUuid(),
           '%event' => $webhook->getEvent(),
-          '@payload' => json_encode($webhook->getPayload()),
+          '@payload' => $this->encode($webhook->getPayload(), $webhook->getContentType()),
           'link' => Link::createFromRoute(
             $this->t('Edit Webhook'),
             'entity.webhook_config.edit_form', [
@@ -241,6 +270,36 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
   }
 
   /**
+   * Set the serializer to use when normalizing/encoding an object.
+   *
+   * @param \Symfony\Component\Serializer\SerializerInterface $serializer
+   *   The serializer service.
+   */
+  public function setSerializer(SerializerInterface $serializer) {
+    $this->serializer = $serializer;
+  }
+
+  /**
+   * Set the decoder to use when decoding a string to an object.
+   *
+   * @param \Symfony\Component\Serializer\Encoder\DecoderInterface $decoder
+   *   The dedocer service.
+   */
+  public function setDecoder(DecoderInterface $decoder) {
+    $this->decoder = $decoder;
+  }
+
+  /**
+   * Set the encoder to use when encoding a string to an object.
+   *
+   * @param \Symfony\Component\Serializer\Encoder\EncoderInterface $encoder
+   *   The encoder service.
+   */
+  public function setEncoder(EncoderInterface $encoder) {
+    $this->encoder = $encoder;
+  }
+
+  /**
    * Encode payload data.
    *
    * @param array $data
@@ -251,15 +310,14 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
    * @return string
    *   A string suitable for a http request.
    */
-  protected static function encode(array $data, $content_type) {
+  protected function encode(array $data, $content_type) {
     try {
-      $serializer = \Drupal::service('serializer');
-      \assert($serializer instanceof SerializerInterface);
-      return $serializer->serialize($data, $content_type);
+      return $this->serializer->serialize($data, $content_type);
     }
     catch (\Exception $e) {
+      $this->logger->error('Unable to serialize object to %content_type', ['%content_type' => $content_type]);
     }
-    return '';
+    return $data;
   }
 
   /**
@@ -271,18 +329,16 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
    *   The format string, e.g. json, xml.
    *
    * @return mixed
-   *   A string suitable for php usage.
+   *   An object suitable for php usage.
    */
-  protected static function decode(array $data, $format) {
+  protected function decode(array $data, $format) {
     try {
-      $serializer = \Drupal::service('serializer');
-      \assert($serializer instanceof SerializerInterface);
-      return $serializer->deserialize($data, $format);
+      return $this->decoder->decode($data, $format);
     }
     catch (\Exception $e) {
+      $this->logger->error('Unable to decode string from %format', ['%format' => $format]);
     }
     return $data;
-
   }
 
 }

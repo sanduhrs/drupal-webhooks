@@ -41,9 +41,10 @@ function webhooks_entity_insert(EntityInterface $entity) {
   foreach ($webhook_configs as $webhook_config) {
     // Create the Webhook object.
     $webhook = new Webhook(
-      ['entity' => $entity->toArray()],
+      $entity,
       [],
-      $event
+      $event,
+      $webhook_config->getContentType()
     );
     // Send the Webhook object.
     $webhooks_service->send($webhook_config, $webhook);
@@ -66,9 +67,10 @@ function webhooks_entity_update(EntityInterface $entity) {
   foreach ($webhook_configs as $webhook_config) {
     // Create the Webhook object.
     $webhook = new Webhook(
-      ['entity' => $entity->toArray()],
+      $entity,
       [],
-      $event
+      $event,
+      $webhook_config->getContentType()
     );
     // Send the Webhook object.
     $webhooks_service->send($webhook_config, $webhook);
@@ -91,9 +93,10 @@ function webhooks_entity_delete(EntityInterface $entity) {
   foreach ($webhook_configs as $webhook_config) {
     // Create the Webhook object.
     $webhook = new Webhook(
-      ['entity' => $entity->toArray()],
+      $entity,
       [],
-      $event
+      $event,
+      $webhook_config->getContentType()
     );
     // Send the Webhook object.
     $webhooks_service->send($webhook_config, $webhook);
