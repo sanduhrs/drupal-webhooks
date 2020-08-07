@@ -2,7 +2,7 @@
 
 namespace Drupal\webhooks;
 
-use Drupal\Component\Uuid\Php as Uuid;
+use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
@@ -81,18 +81,11 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
   protected $serializer;
 
   /**
-   * The decoder.
+   * The Uuid service.
    *
-   * @var \Symfony\Component\Serializer\Encoder\DecoderInterface
+   * @var \Drupal\Component\Uuid\UuidInterface
    */
-  protected $decoder;
-
-  /**
-   * The encoder.
-   *
-   * @var \Symfony\Component\Serializer\Encoder\EncoderInterface
-   */
-  protected $encoder;
+  protected $uuid;
 
   /**
    * WebhooksService constructor.
@@ -110,6 +103,8 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
    * @param \Symfony\Component\Serializer\SerializerInterface $serializer
    *   The serializer.
    *
+   * @param \Drupal\Component\Uuid\UuidInterface $uuid
+   *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
@@ -119,7 +114,8 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
       RequestStack $request_stack,
       EventDispatcherInterface $event_dispatcher,
       EntityTypeManagerInterface $entity_type_manager,
-      SerializerInterface $serializer
+      SerializerInterface $serializer,
+      UuidInterface $uuid
   ) {
     $this->client = $client;
     $this->logger = $logger_factory->get('webhooks');
@@ -127,8 +123,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
     $this->eventDispatcher = $event_dispatcher;
     $this->webhookStorage = $entity_type_manager->getStorage('webhook_config');
     $this->serializer = $serializer;
-    $this->decoder = $serializer;
-    $this->encoder = $serializer;
+    $this->uuid = $uuid;
   }
 
   /**
@@ -148,14 +143,13 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
    * {@inheritdoc}
    */
   public function send(WebhookConfig $webhook_config, Webhook $webhook) {
-    $uuid = new Uuid();
-    $webhook->setUuid($uuid->generate());
+    $webhook->setUuid($this->uuid->generate());
     if ($secret = $webhook_config->getSecret()) {
       $webhook->setSecret($secret);
       $webhook->setSignature();
     }
 
-    $body = $this->encode(
+    $body = $this->serializer->encode(
       $webhook->getPayload(),
       $webhook->getContentType()
     );
@@ -231,7 +225,11 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
       $request->getContentType()
     );
 
-    $webhook = new Webhook($payload, $request->headers->all(), $request->getContent());
+    $webhook = new Webhook(
+      $payload,
+      $request->headers->all(),
+      $request->getContent()
+    );
 
     /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook_config */
     $webhook_config = $this->webhookStorage
@@ -280,39 +278,19 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
   }
 
   /**
-   * Set the decoder to use when decoding a string to an object.
-   *
-   * @param \Symfony\Component\Serializer\Encoder\DecoderInterface $decoder
-   *   The dedocer service.
-   */
-  public function setDecoder(DecoderInterface $decoder) {
-    $this->decoder = $decoder;
-  }
-
-  /**
-   * Set the encoder to use when encoding a string to an object.
-   *
-   * @param \Symfony\Component\Serializer\Encoder\EncoderInterface $encoder
-   *   The encoder service.
-   */
-  public function setEncoder(EncoderInterface $encoder) {
-    $this->encoder = $encoder;
-  }
-
-  /**
    * Encode payload data.
    *
    * @param array $data
    *   The payload data array.
-   * @param string $content_type
+   * @param string $format
    *   The content type string, e.g. json, xml.
    *
    * @return string
    *   A string suitable for a http request.
    */
-  protected function encode(array $data, $content_type) {
+  protected function encode(array $data, $format) {
     try {
-      return $this->serializer->serialize($data, $content_type);
+      return $this->serializer->serialize($data, $format);
     }
     catch (\Exception $e) {
       $this->logger->error('Unable to serialize object to %content_type', ['%content_type' => $content_type]);
@@ -323,7 +301,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
   /**
    * Decode payload data.
    *
-   * @param array $data
+   * @param string $data
    *   The payload data array.
    * @param string $format
    *   The format string, e.g. json, xml.
@@ -331,9 +309,9 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
    * @return mixed
    *   An object suitable for php usage.
    */
-  protected function decode(array $data, $format) {
+  protected function decode($data, $format) {
     try {
-      return $this->decoder->decode($data, $format);
+      return $this->serializer->decode($data, $format);
     }
     catch (\Exception $e) {
       $this->logger->error('Unable to decode string from %format', ['%format' => $format]);
