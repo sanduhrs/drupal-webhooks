@@ -1,7 +1,7 @@
 name: Webhooks
 type: module
 description: "User-defined HTTP callbacks"
-core: 8.x
+core_version_requirement: ^8 || ^9
 package: Webhooks
 dependencies:
   - serialization
