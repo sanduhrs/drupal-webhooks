@@ -4,7 +4,7 @@ namespace Drupal\webhooks\Event;
 
 use Drupal\webhooks\Entity\WebhookConfig;
 use Drupal\webhooks\Webhook;
-use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class SendEvent.
