@@ -253,7 +253,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
     // Verify in both cases: the webhook_config contains a secret
     // and/or the webhook contains a signature.
     if ($webhook_config->getSecret() || $webhook->getSignature()) {
-      $webhook->verify($webhook_config->getSecret());
+      Webhook::verify($webhook_config->getSecret(), $request->getContent(), $request->headers->get('x-hub-signature'));
     }
 
     // Dispatch Webhook Receive event.
