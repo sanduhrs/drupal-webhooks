@@ -169,7 +169,7 @@ class WebhooksTest extends BrowserTestBase {
     $this->assertEqual($intersection, $headers_custom);
 
     // Check for X-Drupal-Delivery header.
-    $this->assertEqual($headers_received['x-drupal-delivery'], $webhook_received->getUuid());
+    $this->assertEqual($headers_received['x-drupal-delivery'], $webhook->getUuid());
 
     // Check for X-Drupal-Event header.
     $this->assertEqual($headers_received['x-drupal-event'], $webhook->getEvent());
@@ -177,7 +177,6 @@ class WebhooksTest extends BrowserTestBase {
 
   /**
    * Test webhook signature.
-   * @group dev
    */
   public function testSignature() {
     $payload = ['payload' => 'attribute'];
