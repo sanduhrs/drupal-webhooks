@@ -349,22 +349,24 @@ class Webhook {
   /**
    * Verify the webhook with the stored secret.
    *
+   * @param string $secret
+   *   The webhook secret.
+   * @param string $payload
+   *   The raw webhook payload.
+   * @param string $signature
+   *   The webhook signature.
+   *
    * @return bool
    *   Boolean TRUE for success, FALSE otherwise.
    *
    * @throws \Drupal\webhooks\Exception\WebhookMismatchSignatureException
    *   Throws exception if signatures do not match.
    */
-  public function verify($secret) {
-    list($algorithm, $user_string) = explode('=', $this->getSignature());
-    $known_string = hash_hmac(
-      $algorithm,
-      json_encode($this->payload),
-      $this->rawPayload,
-      $secret
-    );
+  public static function verify($secret, $payload, $signature) {
+    [$algorithm, $user_string] = explode('=', $signature);
+    $known_string = hash_hmac($algorithm, $payload, $secret);
     if (!hash_equals($known_string, $user_string)) {
-      throw new WebhookMismatchSignatureException($user_string, $algorithm . '=' . $known_string, $this->rawPayload);
+      throw new WebhookMismatchSignatureException($user_string, $algorithm . '=' . $known_string, $payload);
     }
     return TRUE;
   }

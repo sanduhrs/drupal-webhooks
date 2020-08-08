@@ -190,7 +190,12 @@ class WebhooksTest extends BrowserTestBase {
     $webhook_received = $this->state->get('onWebhookReceive_webhook');
 
     // Verify webhook signature.
-    $this->assertEqual($webhook_received->verify(self::WEBHOOK_SECRET), TRUE);
+    $verified = Webhook::verify(
+      self::WEBHOOK_SECRET,
+      $webhook_received->getPayload(TRUE),
+      $webhook_received->getSignature()
+    );
+    $this->assertEqual($verified, TRUE);
   }
 
 }
