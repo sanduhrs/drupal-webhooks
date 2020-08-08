@@ -32,7 +32,7 @@ interface WebhookDispatcherInterface {
    *   The webhook object.
    * @param string $event
    *   Identifier of a particular webhook event, e.g. entity:node:create,
-   *   entity:user:update or entity:taxonomy_term:delete
+   *   entity:user:update or entity:taxonomy_term:delete.
    */
   public function triggerEvent(Webhook $webhook, $event);
 

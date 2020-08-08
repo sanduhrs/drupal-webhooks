@@ -33,7 +33,6 @@ class WebhooksTest extends BrowserTestBase {
    */
   protected $profile = 'minimal';
 
-
   /**
    * {@inheritdoc}
    */

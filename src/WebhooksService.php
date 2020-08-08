@@ -100,8 +100,8 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
    *   The entity type manager.
    * @param \Symfony\Component\Serializer\SerializerInterface $serializer
    *   The serializer.
-   *
    * @param \Drupal\Component\Uuid\UuidInterface $uuid
+   *   The Uuid service.
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
