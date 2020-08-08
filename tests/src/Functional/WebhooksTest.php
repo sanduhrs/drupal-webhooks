@@ -18,6 +18,10 @@ class WebhooksTest extends BrowserTestBase {
 
   const WEBHOOK_ID_OUTGOING = 'webhook_id_outgoing';
 
+  const WEBHOOK_ID_INCOMING_VERIFIED = 'webhook_id_incoming_verified';
+
+  const WEBHOOK_ID_OUTGOING_VERIFIED = 'webhook_id_outgoing_verified';
+
   const WEBHOOK_SECRET = 'iepooleiDahF3eimeikooC2iep1ahqua';
 
   /**
@@ -87,6 +91,32 @@ class WebhooksTest extends BrowserTestBase {
       'events' => [],
       'content_type' => 'application/json',
       'secret' => '',
+      'status' => 1,
+    ])->save();
+
+    // Create an incoming webhook.
+    WebhookConfig::create([
+      'id' => self::WEBHOOK_ID_INCOMING_VERIFIED,
+      'label' => 'Webhook Incoming Verified',
+      'uuid' => \Drupal::service('uuid')->generate(),
+      'payload_url' => '',
+      'type' => 'incoming',
+      'events' => [],
+      'content_type' => 'application/json',
+      'secret' => self::WEBHOOK_SECRET,
+      'status' => 1,
+    ])->save();
+
+    // Create an outgoing webhook.
+    WebhookConfig::create([
+      'id' => self::WEBHOOK_ID_OUTGOING_VERIFIED,
+      'label' => 'Webhook Outgoing Verified',
+      'uuid' => \Drupal::service('uuid')->generate(),
+      'payload_url' => Url::fromRoute('webhooks.webhook_receive', ['incoming_webhook_name' => self::WEBHOOK_ID_INCOMING_VERIFIED])->setAbsolute(TRUE)->toString(),
+      'type' => 'outgoing',
+      'events' => [],
+      'content_type' => 'application/json',
+      'secret' => self::WEBHOOK_SECRET,
       'status' => 1,
     ])->save();
   }
@@ -181,21 +211,13 @@ class WebhooksTest extends BrowserTestBase {
   public function testSignature() {
     $payload = ['payload' => 'attribute'];
 
-    $webhook_config = WebhookConfig::load(self::WEBHOOK_ID_OUTGOING);
+    $webhook_config = WebhookConfig::load(self::WEBHOOK_ID_OUTGOING_VERIFIED);
     $webhook = new Webhook($payload);
-    $webhook->setSecret(self::WEBHOOK_SECRET);
 
     $this->webhookService->send($webhook_config, $webhook);
-    /** @var \Drupal\webhooks\Webhook $webhook_received */
-    $webhook_received = $this->state->get('onWebhookReceive_webhook');
 
-    // Verify webhook signature.
-    $verified = Webhook::verify(
-      self::WEBHOOK_SECRET,
-      $webhook_received->getPayload(TRUE),
-      $webhook_received->getSignature()
-    );
-    $this->assertEqual($verified, TRUE);
+    // This succeeds if the webhook has been verified.
+    $this->assertEqual($this->state->get('onWebhookReceive'), TRUE);
   }
 
 }
