@@ -214,7 +214,7 @@ class Webhook {
    */
   public function setUuid($uuid) {
     $this->uuid = $uuid;
-    $this->addHeaders(['X-Drupal-Webhooks-Delivery' => $uuid]);
+    $this->addHeaders(['X-Drupal-Delivery' => $uuid]);
     return $this;
   }
 
@@ -240,7 +240,7 @@ class Webhook {
   public function setEvent($event) {
     $this->event = $event;
     $this->addHeaders(
-      ['X-Drupal-Webhooks-Event' => $event]
+      ['X-Drupal-Event' => $event]
     );
     return $this;
   }
