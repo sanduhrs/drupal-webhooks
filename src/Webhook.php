@@ -20,13 +20,6 @@ class Webhook {
   protected $headers;
 
   /**
-   * The webhook raw payload, for verification.
-   *
-   * @var string
-   */
-  protected $rawPayload;
-
-  /**
    * The webhook payload.
    *
    * @var array
@@ -75,8 +68,6 @@ class Webhook {
    *   The payload that is being send with the webhook.
    * @param array $headers
    *   The headers that are being send with the webhook.
-   * @param string $rawPayload
-   *   The raw payload that is being send with the webhook.
    * @param string $event
    *   The event that is acted upon.
    * @param string $content_type
@@ -85,12 +76,11 @@ class Webhook {
   public function __construct(
       array $payload = [],
       array $headers = [],
-      $rawPayload = '',
       $event = 'default',
       $content_type = 'json'
   ) {
+    $this->setPayload($payload);
     $this->setHeaders($headers);
-    $this->setPayload($payload, $rawPayload);
     $this->setEvent($event);
     $this->setContentType($content_type);
 
@@ -159,20 +149,16 @@ class Webhook {
   }
 
   /**
-   * Set te payload.
+   * Set the payload.
    *
    * @param array $payload
    *   A payload array.
-   * @param string $raw
-   *   A raw payload string.
    *
    * @return Webhook
    *   The webhook.
    */
-  public function setPayload(array $payload, $raw) {
+  public function setPayload(array $payload) {
     $this->payload = $payload;
-    $this->rawPayload = $raw;
-    $this->setSecret($this->secret);
     return $this;
   }
 
@@ -210,7 +196,8 @@ class Webhook {
    * @param string $uuid
    *   A uuid string.
    *
-   * @return $this
+   * @return Webhook
+   *   The webhook.
    */
   public function setUuid($uuid) {
     $this->uuid = $uuid;
@@ -235,7 +222,8 @@ class Webhook {
    *   An event string in the form of entity:entity_type:action,
    *   e.g. 'entity:user:create', 'entity:user:update' or 'entity:user:delete'.
    *
-   * @return $this
+   * @return Webhook
+   *   The webhook.
    */
   public function setEvent($event) {
     $this->event = $event;
@@ -261,7 +249,8 @@ class Webhook {
    * @param string $content_type
    *   A content type string, e.g. 'json' or 'xml'.
    *
-   * @return $this
+   * @return Webhook
+   *   The webhook.
    */
   public function setContentType($content_type) {
     $this->contentType = $content_type;
@@ -287,7 +276,8 @@ class Webhook {
    * @param string $secret
    *   A secret string.
    *
-   * @return $this
+   * @return Webhook
+   *   The webhook.
    */
   public function setSecret($secret) {
     $this->secret = $secret;
@@ -310,7 +300,8 @@ class Webhook {
    * @param bool $status
    *   New status value.
    *
-   * @return $this
+   * @return Webhook
+   *   The webhook.
    */
   public function setStatus($status) {
     $this->status = $status;
@@ -336,14 +327,19 @@ class Webhook {
   /**
    * Set the payload signature.
    *
-   * @return array
-   *   Returns the updated headers.
+   * @param string $body
+   *   The encoded request body.
+   *
+   * @return Webhook
+   *   The webhook.
    */
-  public function setSignature() {
-    $this->addHeaders([
-      'X-Hub-Signature' => 'sha1=' . hash_hmac('sha1', json_encode($this->payload), $this->secret, FALSE),
-    ]);
-    return $this->headers;
+  public function setSignature($body) {
+    $this->addHeaders(
+      [
+        'X-Hub-Signature' => 'sha1=' . hash_hmac('sha1', $body, $this->secret, FALSE),
+      ]
+    );
+    return $this;
   }
 
   /**
