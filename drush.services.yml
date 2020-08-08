@@ -1,0 +1,5 @@
+services:
+  webhooks.commands:
+    class: \Drupal\webhooks\Commands\WebhooksCommands
+    tags:
+      - { name: drush.command }

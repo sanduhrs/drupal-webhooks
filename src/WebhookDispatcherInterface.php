@@ -26,6 +26,17 @@ interface WebhookDispatcherInterface {
   public function loadMultipleByEvent($event, $type = 'outgoing');
 
   /**
+   * Trigger all webhook subscriptions associated with the given event.
+   *
+   * @param \Drupal\webhooks\Webhook $webhook
+   *   The webhook object.
+   * @param string $event
+   *   Identifier of a particular webhook event, e.g. entity:node:create,
+   *   entity:user:update or entity:taxonomy_term:delete
+   */
+  public function triggerEvent(Webhook $webhook, $event);
+
+  /**
    * Send a webhook.
    *
    * @param \Drupal\webhooks\Entity\WebhookConfig $webhook_config

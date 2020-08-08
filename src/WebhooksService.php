@@ -140,6 +140,23 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
   /**
    * {@inheritdoc}
    */
+  public function triggerEvent(Webhook $webhook, $event) {
+    /** @var \Drupal\webhooks\WebhooksService $webhooks_service */
+    $webhooks_service = \Drupal::service('webhooks.service');
+
+    // Load all webhooks for the occurring event.
+    /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook_config */
+    $webhook_configs = $this->loadMultipleByEvent($event);
+
+    foreach ($webhook_configs as $webhook_config) {
+      // Send the Webhook object.
+      $webhooks_service->send($webhook_config, $webhook);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function send(WebhookConfig $webhook_config, Webhook $webhook) {
     $webhook->setUuid($this->uuid->generate());
     if ($secret = $webhook_config->getSecret()) {
