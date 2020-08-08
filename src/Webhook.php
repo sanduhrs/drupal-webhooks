@@ -353,7 +353,7 @@ class Webhook {
    *   The webhook signature.
    *
    * @return bool
-   *   Boolean TRUE for success, FALSE otherwise.
+   *   Boolean TRUE for success.
    *
    * @throws \Drupal\webhooks\Exception\WebhookMismatchSignatureException
    *   Throws exception if signatures do not match.

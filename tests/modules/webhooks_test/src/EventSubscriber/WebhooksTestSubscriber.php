@@ -40,9 +40,8 @@ class WebhooksTestSubscriber implements EventSubscriberInterface {
     \Drupal::state()->set(__FUNCTION__, TRUE);
 
     $webhook = $event->getWebhook();
-    \Drupal::state()->set(__FUNCTION__ . '_webhook', $webhook);
-
     $webhook_config = $event->getWebhookConfig();
+    \Drupal::state()->set(__FUNCTION__ . '_webhook', $webhook);
     \Drupal::state()->set(__FUNCTION__ . '_webhook_config', $webhook_config);
 
     $this->messenger->addStatus(print_r($webhook_config, TRUE));
@@ -59,9 +58,8 @@ class WebhooksTestSubscriber implements EventSubscriberInterface {
     \Drupal::state()->set(__FUNCTION__, TRUE);
 
     $webhook = $event->getWebhook();
-    \Drupal::state()->set(__FUNCTION__ . '_webhook', $webhook);
-
     $webhook_config = $event->getWebhookConfig();
+    \Drupal::state()->set(__FUNCTION__ . '_webhook', $webhook);
     \Drupal::state()->set(__FUNCTION__ . '_webhook_config', $webhook_config);
 
     $this->messenger->addStatus(print_r($webhook_config, TRUE));

@@ -159,15 +159,14 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
    */
   public function send(WebhookConfig $webhook_config, Webhook $webhook) {
     $webhook->setUuid($this->uuid->generate());
-    if ($secret = $webhook_config->getSecret()) {
-      $webhook->setSecret($secret);
-      $webhook->setSignature();
-    }
-
     $body = $this->serializer->encode(
       $webhook->getPayload(),
       $webhook->getContentType()
     );
+    if ($secret = $webhook_config->getSecret()) {
+      $webhook->setSecret($secret);
+      $webhook->setSignature($body);
+    }
 
     try {
       $this->client->post(
@@ -242,8 +241,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
 
     $webhook = new Webhook(
       $payload,
-      $request->headers->all(),
-      $request->getContent()
+      $request->headers->all()
     );
 
     /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook_config */
@@ -253,7 +251,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
     // Verify in both cases: the webhook_config contains a secret
     // and/or the webhook contains a signature.
     if ($webhook_config->getSecret() || $webhook->getSignature()) {
-      Webhook::verify($webhook_config->getSecret(), $request->getContent(), $request->headers->get('x-hub-signature'));
+      Webhook::verify($webhook_config->getSecret(), $request->getContent(), $webhook->getSignature());
     }
 
     // Dispatch Webhook Receive event.

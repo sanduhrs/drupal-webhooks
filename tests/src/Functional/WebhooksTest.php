@@ -54,6 +54,7 @@ class WebhooksTest extends BrowserTestBase {
   protected $state;
 
   /**
+   * The uuid.
    *
    * @var \Drupal\Component\Uuid\UuidInterface
    */
