@@ -22,7 +22,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @package Drupal\webhooks
  */
-class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInterface {
+class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInterface, WebhookSerializerInterface {
 
   use StringTranslationTrait;
 
@@ -286,12 +286,12 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
    * @return string
    *   A string suitable for a http request.
    */
-  protected function encode(array $data, $format) {
+  public function encode(array $data, $format) {
     try {
       return $this->serializer->serialize($data, $format);
     }
     catch (\Exception $e) {
-      $this->logger->error('Unable to serialize object to %content_type', ['%content_type' => $content_type]);
+      $this->logger->error('Unable to serialize object to %format', ['%format' => $format]);
     }
     return $data;
   }
@@ -307,7 +307,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
    * @return mixed
    *   An object suitable for php usage.
    */
-  protected function decode($data, $format) {
+  public function decode($data, $format) {
     try {
       return $this->serializer->decode($data, $format);
     }
