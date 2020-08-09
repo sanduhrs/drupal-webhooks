@@ -18,32 +18,32 @@ class WebhooksCommands extends DrushCommands {
   /**
    * Trigger all active webhooks configured for a given event.
    *
-   * @param $event
-   *   Specify an event name to be triggered, e.g. entity:node:create,
-   *   entity:user:update or entity:taxonomy_term:delete
+   * @param string $event
+   *   Specify an event name to be triggered, e.g. 'entity:node:create',
+   *   'entity:user:update' or 'entity:taxonomy_term:delete'
    * @option payload
-   *   JSON-encoded webhook payload for testing.
+   *   JSON-encoded webhook payload for testing, e.g. '{"ping": "pong"}'.
    * @option headers
-   *   JSON-encoded webhook headers for testing.
+   *   JSON-encoded webhook headers for testing, e.g. '{"X-Custom": "Header"}'.
    * @option content_type
-   *   Specify the content-type to send the webhook with.
+   *   Specify the content-type to send the webhook with, e.g. application/json
+   *   or application/xml.
    * @usage webhooks-trigger entity:node:create
    *   Usage description
    *
    * @command webhooks:trigger
    * @aliases wt
    */
-  public function trigger($event, $options = ['payload' => '', 'headers' => '', 'content_type' => 'json']) {
+  public function trigger($event, $options = ['payload' => '', 'headers' => '', 'event' => 'default', 'content_type' => 'application/json']) {
     $payload = (array) json_decode($options['payload'], TRUE);
     $headers = (array) json_decode($options['headers'], TRUE);
 
-    $event = (string) $event;
-    $content_type = (string) $options['content_type'];
+    $event = $event;
+    $content_type = $options['content_type'];
 
     $webhook = new Webhook(
       $payload,
       $headers,
-      $payload,
       $event,
       $content_type
     );
@@ -52,7 +52,7 @@ class WebhooksCommands extends DrushCommands {
     $webhooks_service = \Drupal::service('webhooks.service');
     // Trigger the webhook for all subscribers.
     $webhooks_service->triggerEvent($webhook, $event);
-    $this->logger()->success($this->t('The webhook @event has been triggered with payload @payload', ['@event' => $event, '@payload' => $options['payload']]));
+    $this->logger()->success($this->t('A webhook has been triggered with event @event and payload @payload', ['@event' => $event, '@payload' => $options['payload']]));
   }
 
   /**

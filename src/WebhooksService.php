@@ -29,12 +29,12 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
   /**
    * The Json format.
    */
-  const CONTENT_TYPE_JSON = 'json';
+  const CONTENT_TYPE_JSON = 'application/json';
 
   /**
    * The Xml format.
    */
-  const CONTENT_TYPE_XML = 'xml';
+  const CONTENT_TYPE_XML = 'application/xml';
 
   /**
    * The http client.
@@ -143,7 +143,6 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
   public function triggerEvent(Webhook $webhook, $event) {
     /** @var \Drupal\webhooks\WebhooksService $webhooks_service */
     $webhooks_service = \Drupal::service('webhooks.service');
-
     // Load all webhooks for the occurring event.
     /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook_config */
     $webhook_configs = $this->loadMultipleByEvent($event);
