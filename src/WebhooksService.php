@@ -161,7 +161,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
     $webhook->setUuid($this->uuid->generate());
     $body = $this->serializer->encode(
       $webhook->getPayload(),
-      $webhook->getContentType()
+      $webhook->getMimeSubType()
     );
     if ($secret = $webhook_config->getSecret()) {
       $webhook->setSecret($secret);
@@ -207,7 +207,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
         '%subscriber' => $webhook_config->id(),
         '%uuid' => $webhook->getUuid(),
         '%event' => $webhook->getEvent(),
-        '@payload' => $this->encode($webhook->getPayload(), $webhook->getContentType()),
+        '@payload' => $this->encode($webhook->getPayload(), $webhook->getMimeSubType()),
         'link' => Link::createFromRoute(
           $this->t('Edit Webhook'),
           'entity.webhook_config.edit_form', [
@@ -266,7 +266,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
           '%subscriber' => $webhook_config->id(),
           '%uuid' => $webhook->getUuid(),
           '%event' => $webhook->getEvent(),
-          '@payload' => $this->encode($webhook->getPayload(), $webhook->getContentType()),
+          '@payload' => $this->encode($webhook->getPayload(), $webhook->getMimeSubType()),
           'link' => Link::createFromRoute(
             $this->t('Edit Webhook'),
             'entity.webhook_config.edit_form', [

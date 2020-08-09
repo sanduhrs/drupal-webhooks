@@ -77,7 +77,7 @@ class Webhook {
       array $payload = [],
       array $headers = [],
       $event = 'default',
-      $content_type = 'json'
+      $content_type = 'application/json'
   ) {
     $this->setPayload($payload);
     $this->setHeaders($headers);
@@ -244,10 +244,30 @@ class Webhook {
   }
 
   /**
+   * Get the content type.
+   *
+   * @return string
+   *   The content type string.
+   */
+  public function getMimeType() {
+    return explode('/', $this->contentType)[0];
+  }
+
+  /**
+   * Get the content type.
+   *
+   * @return string
+   *   The content type string.
+   */
+  public function getMimeSubType() {
+    return explode('/', $this->contentType)[1];
+  }
+
+  /**
    * Set the content type.
    *
    * @param string $content_type
-   *   A content type string, e.g. 'json' or 'xml'.
+   *   A content type string, e.g. 'application/json' or 'application/xml'.
    *
    * @return Webhook
    *   The webhook.
@@ -255,7 +275,7 @@ class Webhook {
   public function setContentType($content_type) {
     $this->contentType = $content_type;
     $this->addHeaders(
-      ['Content-Type' => 'application/' . $content_type]
+      ['Content-Type' => $content_type]
     );
     return $this;
   }
