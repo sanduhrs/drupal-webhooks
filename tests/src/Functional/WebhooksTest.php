@@ -24,6 +24,10 @@ class WebhooksTest extends BrowserTestBase {
 
   const WEBHOOK_SECRET = 'iepooleiDahF3eimeikooC2iep1ahqua';
 
+  const WEBHOOK_ID_OUTGOING_XML = 'webhook_id_outgoing_xml';
+
+  const WEBHOOK_ID_INCOMING_XML = 'webhook_id_incoming_xml';
+
   /**
    * {@inheritdoc}
    */
@@ -134,6 +138,32 @@ class WebhooksTest extends BrowserTestBase {
       'secret' => self::WEBHOOK_SECRET,
       'status' => 1,
     ])->save();
+
+    // Create an incoming webhook.
+    WebhookConfig::create([
+      'id' => self::WEBHOOK_ID_INCOMING_XML,
+      'label' => 'Webhook Incoming XML',
+      'uuid' => \Drupal::service('uuid')->generate(),
+      'payload_url' => '',
+      'type' => 'incoming',
+      'events' => [],
+      'content_type' => 'application/xml',
+      'secret' => '',
+      'status' => 1,
+    ])->save();
+
+    // Create an outgoing webhook.
+    WebhookConfig::create([
+      'id' => self::WEBHOOK_ID_OUTGOING_XML,
+      'label' => 'Webhook Outgoing XML',
+      'uuid' => \Drupal::service('uuid')->generate(),
+      'payload_url' => Url::fromRoute('webhooks.webhook_receive', ['incoming_webhook_name' => self::WEBHOOK_ID_INCOMING_XML])->setAbsolute(TRUE)->toString(),
+      'type' => 'outgoing',
+      'events' => [],
+      'content_type' => 'application/xml',
+      'secret' => '',
+      'status' => 1,
+    ])->save();
   }
 
   /**
@@ -226,6 +256,37 @@ class WebhooksTest extends BrowserTestBase {
 
     // This succeeds if the webhook has been verified.
     $this->assertEqual($this->state->get('onWebhookReceive'), TRUE);
+  }
+
+  /**
+   * Test webhook content type.
+   */
+  public function testContentTypeJson() {
+    $webhook_config = WebhookConfig::load(self::WEBHOOK_ID_OUTGOING);
+    $webhook = new Webhook($this->payload);
+    $webhook->setContentType('application/json');
+
+    $this->webhookService->send($webhook_config, $webhook);
+
+    /** @var \Drupal\webhooks\Webhook $webhook_received */
+    $webhook_received = $this->state->get('onWebhookReceive_webhook');
+    $this->assertEqual($webhook_received->getContentType(), 'application/json');
+  }
+
+  /**
+   * Test webhook content type.
+   * @group dev
+   */
+  public function testContentTypeXml() {
+    $webhook_config = WebhookConfig::load(self::WEBHOOK_ID_OUTGOING_XML);
+    $webhook = new Webhook($this->payload);
+    $webhook->setContentType('application/xml');
+
+    $this->webhookService->send($webhook_config, $webhook);
+
+    /** @var \Drupal\webhooks\Webhook $webhook_received */
+    $webhook_received = $this->state->get('onWebhookReceive_webhook');
+    $this->assertEqual($webhook_received->getContentType(), 'application/xml');
   }
 
 }

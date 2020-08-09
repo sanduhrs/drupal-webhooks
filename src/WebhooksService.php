@@ -241,7 +241,9 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
 
     $webhook = new Webhook(
       $payload,
-      $request->headers->all()
+      $request->headers->all(),
+      '',
+      $request->headers->get('Content-Type')
     );
 
     /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook_config */
