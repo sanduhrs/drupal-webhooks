@@ -201,7 +201,9 @@ class Webhook {
    */
   public function setUuid($uuid) {
     $this->uuid = $uuid;
-    $this->addHeaders(['X-Drupal-Delivery' => $uuid]);
+    $this->addHeaders([
+      'X-Drupal-Delivery' => $uuid,
+    ]);
     return $this;
   }
 
@@ -227,9 +229,9 @@ class Webhook {
    */
   public function setEvent($event) {
     $this->event = $event;
-    $this->addHeaders(
-      ['X-Drupal-Event' => $event]
-    );
+    $this->addHeaders([
+      'X-Drupal-Event' => $event,
+    ]);
     return $this;
   }
 
@@ -274,9 +276,9 @@ class Webhook {
    */
   public function setContentType($content_type) {
     $this->contentType = $content_type;
-    $this->addHeaders(
-      ['Content-Type' => $content_type]
-    );
+    $this->addHeaders([
+      'Content-Type' => $content_type,
+    ]);
     return $this;
   }
 
@@ -354,11 +356,9 @@ class Webhook {
    *   The webhook.
    */
   public function setSignature($body) {
-    $this->addHeaders(
-      [
-        'X-Hub-Signature' => 'sha1=' . hash_hmac('sha1', $body, $this->secret, FALSE),
-      ]
-    );
+    $this->addHeaders([
+      'X-Hub-Signature' => 'sha1=' . hash_hmac('sha1', $body, $this->secret, FALSE),
+    ]);
     return $this;
   }
 
