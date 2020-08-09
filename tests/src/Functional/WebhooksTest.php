@@ -61,6 +61,20 @@ class WebhooksTest extends BrowserTestBase {
   protected $uuid;
 
   /**
+   * The payload.
+   *
+   * @var string[]
+   */
+  protected $payload = ['payload' => 'attribute'];
+
+  /**
+   * The headers.
+   *
+   * @var string[]
+   */
+  protected $headers = ['header-type' => 'header-value'];
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp():void {
@@ -145,7 +159,7 @@ class WebhooksTest extends BrowserTestBase {
    */
   public function testEventSend() {
     $webhook_config = WebhookConfig::load(self::WEBHOOK_ID_OUTGOING);
-    $webhook = new Webhook(['payload' => 'attribute']);
+    $webhook = new Webhook($this->payload);
 
     $this->webhookService->send($webhook_config, $webhook);
 
@@ -157,7 +171,7 @@ class WebhooksTest extends BrowserTestBase {
    */
   public function testEventReceive() {
     $webhook_config = WebhookConfig::load(self::WEBHOOK_ID_OUTGOING);
-    $webhook = new Webhook(['payload' => 'attribute']);
+    $webhook = new Webhook($this->payload);
 
     $this->webhookService->send($webhook_config, $webhook);
 
@@ -168,27 +182,22 @@ class WebhooksTest extends BrowserTestBase {
    * Test webhook payload.
    */
   public function testPayload() {
-    $payload = ['payload' => 'attribute'];
-
     $webhook_config = WebhookConfig::load(self::WEBHOOK_ID_OUTGOING);
-    $webhook = new Webhook($payload);
+    $webhook = new Webhook($this->payload);
 
     $this->webhookService->send($webhook_config, $webhook);
     /** @var \Drupal\webhooks\Webhook $webhook_received */
     $webhook_received = $this->state->get('onWebhookReceive_webhook');
 
-    $this->assertEqual($webhook_received->getPayload(), $payload);
+    $this->assertEqual($webhook_received->getPayload(), $this->payload);
   }
 
   /**
    * Test webhook headers.
    */
   public function testHeaders() {
-    $headers_custom = ['header-type' => 'header-value'];
-    $payload = ['payload' => 'attribute'];
-
     $webhook_config = WebhookConfig::load(self::WEBHOOK_ID_OUTGOING);
-    $webhook = new Webhook($payload, $headers_custom);
+    $webhook = new Webhook($this->payload, $this->headers);
 
     $this->webhookService->send($webhook_config, $webhook);
     /** @var \Drupal\webhooks\Webhook $webhook_received */
@@ -196,8 +205,8 @@ class WebhooksTest extends BrowserTestBase {
     $headers_received = $webhook_received->getHeaders();
 
     // Additional custom headers.
-    $intersection = array_intersect($headers_received, $headers_custom);
-    $this->assertEqual($intersection, $headers_custom);
+    $intersection = array_intersect($headers_received, $this->headers);
+    $this->assertEqual($intersection, $this->headers);
 
     // Check for X-Drupal-Delivery header.
     $this->assertEqual($headers_received['x-drupal-delivery'], $webhook->getUuid());
@@ -210,10 +219,8 @@ class WebhooksTest extends BrowserTestBase {
    * Test webhook signature.
    */
   public function testSignature() {
-    $payload = ['payload' => 'attribute'];
-
     $webhook_config = WebhookConfig::load(self::WEBHOOK_ID_OUTGOING_VERIFIED);
-    $webhook = new Webhook($payload);
+    $webhook = new Webhook($this->payload);
 
     $this->webhookService->send($webhook_config, $webhook);
 
