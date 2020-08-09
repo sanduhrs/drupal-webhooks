@@ -275,7 +275,6 @@ class WebhooksTest extends BrowserTestBase {
 
   /**
    * Test webhook content type.
-   * @group dev
    */
   public function testContentTypeXml() {
     $webhook_config = WebhookConfig::load(self::WEBHOOK_ID_OUTGOING_XML);
