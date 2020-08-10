@@ -1,0 +1,8 @@
+name: Webhook
+type: module
+description: 'Provides a webhook entity.'
+package: Webhooks
+core: 8.x
+core_version_requirement: ^8 || ^9
+dependencies:
+  - webhooks
