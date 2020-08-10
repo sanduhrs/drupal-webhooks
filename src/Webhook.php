@@ -131,10 +131,9 @@ class Webhook {
    *   The webhook.
    */
   public function addHeaders(array $headers) {
-    $this->headers = array_merge(
-      $this->headers,
-      $headers
-    );
+    foreach ($headers as $name => $value) {
+      $this->headers[strtolower($name)] = $value;
+    }
     return $this;
   }
 
