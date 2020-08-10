@@ -254,12 +254,20 @@ class WebhooksTest extends BrowserTestBase {
 
     $this->webhookService->send($webhook_config, $webhook);
 
-    // This succeeds if the webhook has been verified.
+    // Make sure the secret has been set.
+    $this->assertEqual($webhook_config->getSecret(), self::WEBHOOK_SECRET);
+
+    // This succeeds if the webhook has been verified and accepted.
     $this->assertEqual($this->state->get('onWebhookReceive'), TRUE);
+
+    /** @var \Drupal\webhooks\Webhook $webhook_received */
+    $webhook_received = $this->state->get('onWebhookReceive_webhook');
+    // Verify signature.
+    $this->assertEqual($webhook_received->getSignature(), $webhook->getSignature());
   }
 
   /**
-   * Test webhook content type.
+   * Test webhook content type JSON.
    */
   public function testContentTypeJson() {
     $webhook_config = WebhookConfig::load(self::WEBHOOK_ID_OUTGOING);
@@ -274,7 +282,7 @@ class WebhooksTest extends BrowserTestBase {
   }
 
   /**
-   * Test webhook content type.
+   * Test webhook content type XML.
    */
   public function testContentTypeXml() {
     $webhook_config = WebhookConfig::load(self::WEBHOOK_ID_OUTGOING_XML);
@@ -286,6 +294,20 @@ class WebhooksTest extends BrowserTestBase {
     /** @var \Drupal\webhooks\Webhook $webhook_received */
     $webhook_received = $this->state->get('onWebhookReceive_webhook');
     $this->assertEqual($webhook_received->getContentType(), 'application/xml');
+  }
+
+  /**
+   * Test webhook delivery id matches uuid.
+   */
+  public function testDeliveryIdUuid() {
+    $webhook_config = WebhookConfig::load(self::WEBHOOK_ID_OUTGOING);
+    $webhook = new Webhook($this->payload);
+
+    $this->webhookService->send($webhook_config, $webhook);
+
+    /** @var \Drupal\webhooks\Webhook $webhook_received */
+    $webhook_received = $this->state->get('onWebhookReceive_webhook');
+    $this->assertEqual($webhook_received->getUuid(), $webhook->getUuid());
   }
 
 }
