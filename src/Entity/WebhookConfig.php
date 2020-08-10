@@ -193,7 +193,7 @@ class WebhookConfig extends ConfigEntityBase implements WebhookConfigInterface {
    * Get the content type.
    *
    * @return string
-   *   The content type string, e.g. json, xml.
+   *   The content type string, e.g. 'application/json', 'application/xml'.
    */
   public function getContentType() {
     return $this->content_type;
