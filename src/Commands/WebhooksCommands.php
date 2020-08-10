@@ -20,7 +20,7 @@ class WebhooksCommands extends DrushCommands {
    *
    * @param string $event
    *   Specify an event name to be triggered, e.g. 'entity:node:create',
-   *   'entity:user:update' or 'entity:taxonomy_term:delete'
+   *   'entity:user:update' or 'entity:taxonomy_term:delete'.
    * @option payload
    *   JSON-encoded webhook payload for testing, e.g. '{"ping": "pong"}'.
    * @option headers
@@ -34,6 +34,7 @@ class WebhooksCommands extends DrushCommands {
    * @command webhooks:trigger
    * @aliases wt
    */
+  // @phpcs:ignore Drupal.Commenting.FunctionComment.ParamMissingDefinition,Drupal.Arrays.Array.LongLineDeclaration,Drupal.Commenting.FunctionComment.Missing
   public function trigger($event, $options = ['payload' => '', 'headers' => '', 'event' => 'default', 'content_type' => 'application/json']) {
     $payload = (array) json_decode($options['payload'], TRUE);
     $headers = (array) json_decode($options['headers'], TRUE);
@@ -76,6 +77,7 @@ class WebhooksCommands extends DrushCommands {
    * @aliases pml,pm-list
    * @filter-default-field display_name
    * @return \Consolidation\OutputFormatters\StructuredData\RowsOfFields
+   *   The rows of fields object.
    */
   public function list($options = ['type' => '', 'status' => NULL]) {
     $query = \Drupal::entityQuery('webhook_config');
