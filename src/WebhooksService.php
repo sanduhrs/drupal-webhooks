@@ -244,6 +244,8 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
       '',
       $request->headers->get('Content-Type')
     );
+    $webhook->setUuid($request->headers->get('X-Drupal-Delivery'));
+    $webhook->setEvent($request->headers->get('X-Drupal-Event'));
 
     /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook_config */
     $webhook_config = $this->webhookStorage
