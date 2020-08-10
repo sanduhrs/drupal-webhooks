@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
 use Drupal\webhooks\Entity\WebhookConfig;
 use Drupal\webhooks\Event\WebhookEvents;
 use Drupal\webhooks\Event\ReceiveEvent;
@@ -173,6 +174,9 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
         [
           'headers' => $webhook->getHeaders(),
           'body' => $body,
+          // Workaround for blocking local to local requests,
+          // there will be 'Dispatch Failed' errors in the logs.
+          'timeout' => (strpos($webhook_config->getPayloadUrl(), \Drupal::request()->getHost())) ? 0.1 : 0,
         ]
       );
     }
