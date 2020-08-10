@@ -7,6 +7,7 @@
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\user\Entity\User;
 use Drupal\webhooks\Webhook;
 
 /**
@@ -14,7 +15,6 @@ use Drupal\webhooks\Webhook;
  */
 function webhooks_help($route_name, RouteMatchInterface $route_match) {
   switch ($route_name) {
-    // Main module help for the webhooks module.
     case 'help.page.webhooks':
       $output = '';
       $output .= '<h3>' . t('Webhooks') . '</h3>';
@@ -29,24 +29,27 @@ function webhooks_help($route_name, RouteMatchInterface $route_match) {
  * Implements hook_entity_insert().
  */
 function webhooks_entity_insert(EntityInterface $entity) {
-  $event = implode(':', ['entity', $entity->getEntityType()->id(), 'create']);
-
   /** @var \Drupal\webhooks\WebhooksService $webhooks_service */
   $webhooks_service = \Drupal::service('webhooks.service');
+  /** @var \Symfony\Component\Serializer\Serializer $serializer */
+  $serializer = \Drupal::service('serializer');
 
-  // Load all webhooks for the occurring event.
+  $event = implode(':', ['entity', $entity->getEntityType()->id(), 'create']);
+  $user = User::load(\Drupal::currentUser()->id());
   $webhook_configs = $webhooks_service->loadMultipleByEvent($event);
 
   /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook_config */
   foreach ($webhook_configs as $webhook_config) {
-    // Create the Webhook object.
     $webhook = new Webhook(
-      [$entity],
+      [
+        'event' => $event,
+        'account' => $serializer->normalize($user),
+        'entity' => $serializer->normalize($entity),
+      ],
       [],
       $event,
       $webhook_config->getContentType()
     );
-    // Send the Webhook object.
     $webhooks_service->send($webhook_config, $webhook);
   }
 }
@@ -55,24 +58,27 @@ function webhooks_entity_insert(EntityInterface $entity) {
  * Implements hook_entity_update().
  */
 function webhooks_entity_update(EntityInterface $entity) {
-  $event = implode(':', ['entity', $entity->getEntityType()->id(), 'update']);
-
   /** @var \Drupal\webhooks\WebhooksService $webhooks_service */
   $webhooks_service = \Drupal::service('webhooks.service');
+  /** @var \Symfony\Component\Serializer\Serializer $serializer */
+  $serializer = \Drupal::service('serializer');
 
-  // Load all webhooks for the occurring event.
+  $event = implode(':', ['entity', $entity->getEntityType()->id(), 'update']);
+  $user = User::load(\Drupal::currentUser()->id());
   $webhook_configs = $webhooks_service->loadMultipleByEvent($event);
 
   /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook_config */
   foreach ($webhook_configs as $webhook_config) {
-    // Create the Webhook object.
     $webhook = new Webhook(
-      [$entity],
+      [
+        'event' => $event,
+        'account' => $serializer->normalize($user),
+        'entity' => $serializer->normalize($entity),
+      ],
       [],
       $event,
       $webhook_config->getContentType()
     );
-    // Send the Webhook object.
     $webhooks_service->send($webhook_config, $webhook);
   }
 }
@@ -81,24 +87,27 @@ function webhooks_entity_update(EntityInterface $entity) {
  * Implements hook_entity_delete().
  */
 function webhooks_entity_delete(EntityInterface $entity) {
-  $event = implode(':', ['entity', $entity->getEntityType()->id(), 'delete']);
-
   /** @var \Drupal\webhooks\WebhooksService $webhooks_service */
   $webhooks_service = \Drupal::service('webhooks.service');
+  /** @var \Symfony\Component\Serializer\Serializer $serializer */
+  $serializer = \Drupal::service('serializer');
 
-  // Load all webhooks for the occurring event.
+  $event = implode(':', ['entity', $entity->getEntityType()->id(), 'delete']);
+  $user = User::load(\Drupal::currentUser()->id());
   $webhook_configs = $webhooks_service->loadMultipleByEvent($event);
 
   /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook_config */
   foreach ($webhook_configs as $webhook_config) {
-    // Create the Webhook object.
     $webhook = new Webhook(
-      [$entity],
+      [
+        'event' => $event,
+        'account' => $serializer->normalize($user),
+        'entity' => $serializer->normalize($entity),
+      ],
       [],
       $event,
       $webhook_config->getContentType()
     );
-    // Send the Webhook object.
     $webhooks_service->send($webhook_config, $webhook);
   }
 }
