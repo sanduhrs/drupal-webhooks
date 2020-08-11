@@ -15,7 +15,7 @@ use Drupal\webhooks\Exception\WebhookIncomingEndpointNotFoundException;
 use GuzzleHttp\Client;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * Class WebhookService.
@@ -98,7 +98,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
    *   The event dispatcher.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Symfony\Component\Serializer\SerializerInterface $serializer
+   * @param \Symfony\Component\Serializer\Serializer $serializer
    *   The serializer.
    * @param \Drupal\Component\Uuid\UuidInterface $uuid
    *   The Uuid service.
@@ -112,7 +112,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
       RequestStack $request_stack,
       EventDispatcherInterface $event_dispatcher,
       EntityTypeManagerInterface $entity_type_manager,
-      SerializerInterface $serializer,
+      Serializer $serializer,
       UuidInterface $uuid
   ) {
     $this->client = $client;
@@ -158,7 +158,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
    */
   public function send(WebhookConfig $webhook_config, Webhook $webhook) {
     $webhook->setUuid($this->uuid->generate());
-    $body = $this->serializer->encode(
+    $body = $this->encode(
       $webhook->getPayload(),
       $webhook->getMimeSubType()
     );
@@ -297,45 +297,31 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
   }
 
   /**
-   * Encode payload data.
-   *
-   * @param array $data
-   *   The payload data array.
-   * @param string $format
-   *   The content type string, e.g. json, xml.
-   *
-   * @return string
-   *   A string suitable for a http request.
+   * {@inheritdoc}
    */
-  public function encode(array $data, $format) {
-    try {
-      return $this->serializer->serialize($data, $format);
-    }
-    catch (\Exception $e) {
-      $this->logger->error('Unable to serialize object to %format', ['%format' => $format]);
-    }
-    return $data;
+  public function encode($data, $format, array $context = []) {
+    return $this->serializer->encode($data, $format);
   }
 
   /**
-   * Decode payload data.
-   *
-   * @param string $data
-   *   The payload data array.
-   * @param string $format
-   *   The format string, e.g. json, xml.
-   *
-   * @return mixed
-   *   An object suitable for php usage.
+   * {@inheritdoc}
    */
-  public function decode($data, $format) {
-    try {
-      return $this->serializer->decode($data, $format);
-    }
-    catch (\Exception $e) {
-      $this->logger->error('Unable to decode string from %format', ['%format' => $format]);
-    }
-    return $data;
+  public function supportsEncoding($format, array $context = []) {
+    return $this->serializer->supportsEncoding($format, $context);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function decode($data, $format, array $context = []) {
+    return $this->serializer->decode($data, $format);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function supportsDecoding($format, array $context = []) {
+    return $this->serializer->supportsDecoding($format, $context);
   }
 
 }
