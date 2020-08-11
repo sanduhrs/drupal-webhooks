@@ -74,7 +74,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
   /**
    * The serializer.
    *
-   * @var \Symfony\Component\Serializer\SerializerInterface
+   * @var \Symfony\Component\Serializer\Serializer
    */
   protected $serializer;
 
@@ -289,10 +289,10 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
   /**
    * Set the serializer to use when normalizing/encoding an object.
    *
-   * @param \Symfony\Component\Serializer\SerializerInterface $serializer
+   * @param \Symfony\Component\Serializer\Serializer $serializer
    *   The serializer service.
    */
-  public function setSerializer(SerializerInterface $serializer) {
+  public function setSerializer(Serializer $serializer) {
     $this->serializer = $serializer;
   }
 
