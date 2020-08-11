@@ -4,6 +4,7 @@ namespace Drupal\webhooks\Form;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\webhooks\Entity\WebhookConfig;
 
 /**
  * Class WebhookConfigForm.
@@ -53,8 +54,8 @@ class WebhookConfigForm extends EntityForm {
       '#title' => $this->t("Content Type"),
       '#description' => $this->t("The Content Type of your webhook."),
       '#options' => [
-        'application/json' => $this->t('application/json'),
-        'application/xml' => $this->t('application/xml'),
+        WebhookConfig::CONTENT_TYPE_JSON => $this->t('application/json'),
+        WebhookConfig::CONTENT_TYPE_XML => $this->t('application/xml'),
       ],
       '#default_value' => $webhook_config->getContentType(),
     ];

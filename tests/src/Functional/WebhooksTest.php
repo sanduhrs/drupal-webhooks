@@ -95,7 +95,7 @@ class WebhooksTest extends BrowserTestBase {
       'payload_url' => '',
       'type' => 'incoming',
       'events' => [],
-      'content_type' => 'application/json',
+      'content_type' => WebhookConfig::CONTENT_TYPE_JSON,
       'secret' => '',
       'status' => 1,
     ])->save();
@@ -108,7 +108,7 @@ class WebhooksTest extends BrowserTestBase {
       'payload_url' => Url::fromRoute('webhooks.webhook_receive', ['incoming_webhook_name' => self::WEBHOOK_ID_INCOMING])->setAbsolute(TRUE)->toString(),
       'type' => 'outgoing',
       'events' => [],
-      'content_type' => 'application/json',
+      'content_type' => WebhookConfig::CONTENT_TYPE_JSON,
       'secret' => '',
       'status' => 1,
     ])->save();
@@ -121,7 +121,7 @@ class WebhooksTest extends BrowserTestBase {
       'payload_url' => '',
       'type' => 'incoming',
       'events' => [],
-      'content_type' => 'application/json',
+      'content_type' => WebhookConfig::CONTENT_TYPE_JSON,
       'secret' => self::WEBHOOK_SECRET,
       'status' => 1,
     ])->save();
@@ -134,7 +134,7 @@ class WebhooksTest extends BrowserTestBase {
       'payload_url' => Url::fromRoute('webhooks.webhook_receive', ['incoming_webhook_name' => self::WEBHOOK_ID_INCOMING_VERIFIED])->setAbsolute(TRUE)->toString(),
       'type' => 'outgoing',
       'events' => [],
-      'content_type' => 'application/json',
+      'content_type' => WebhookConfig::CONTENT_TYPE_JSON,
       'secret' => self::WEBHOOK_SECRET,
       'status' => 1,
     ])->save();
@@ -147,7 +147,7 @@ class WebhooksTest extends BrowserTestBase {
       'payload_url' => '',
       'type' => 'incoming',
       'events' => [],
-      'content_type' => 'application/xml',
+      'content_type' => WebhookConfig::CONTENT_TYPE_XML,
       'secret' => '',
       'status' => 1,
     ])->save();
@@ -160,7 +160,7 @@ class WebhooksTest extends BrowserTestBase {
       'payload_url' => Url::fromRoute('webhooks.webhook_receive', ['incoming_webhook_name' => self::WEBHOOK_ID_INCOMING_XML])->setAbsolute(TRUE)->toString(),
       'type' => 'outgoing',
       'events' => [],
-      'content_type' => 'application/xml',
+      'content_type' => WebhookConfig::CONTENT_TYPE_XML,
       'secret' => '',
       'status' => 1,
     ])->save();
@@ -272,13 +272,13 @@ class WebhooksTest extends BrowserTestBase {
   public function testContentTypeJson() {
     $webhook_config = WebhookConfig::load(self::WEBHOOK_ID_OUTGOING);
     $webhook = new Webhook($this->payload);
-    $webhook->setContentType('application/json');
+    $webhook->setContentType(WebhookConfig::CONTENT_TYPE_JSON);
 
     $this->webhookService->send($webhook_config, $webhook);
 
     /** @var \Drupal\webhooks\Webhook $webhook_received */
     $webhook_received = $this->state->get('onWebhookReceive_webhook');
-    $this->assertEqual($webhook_received->getContentType(), 'application/json');
+    $this->assertEqual($webhook_received->getContentType(), WebhookConfig::CONTENT_TYPE_JSON);
   }
 
   /**
@@ -287,13 +287,13 @@ class WebhooksTest extends BrowserTestBase {
   public function testContentTypeXml() {
     $webhook_config = WebhookConfig::load(self::WEBHOOK_ID_OUTGOING_XML);
     $webhook = new Webhook($this->payload);
-    $webhook->setContentType('application/xml');
+    $webhook->setContentType(WebhookConfig::CONTENT_TYPE_XML);
 
     $this->webhookService->send($webhook_config, $webhook);
 
     /** @var \Drupal\webhooks\Webhook $webhook_received */
     $webhook_received = $this->state->get('onWebhookReceive_webhook');
-    $this->assertEqual($webhook_received->getContentType(), 'application/xml');
+    $this->assertEqual($webhook_received->getContentType(), WebhookConfig::CONTENT_TYPE_XML);
   }
 
   /**

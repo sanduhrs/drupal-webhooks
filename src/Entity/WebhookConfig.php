@@ -52,6 +52,16 @@ use Drupal\Core\Entity\EntityStorageInterface;
 class WebhookConfig extends ConfigEntityBase implements WebhookConfigInterface {
 
   /**
+   * The Json format.
+   */
+  const CONTENT_TYPE_JSON = 'application/json';
+
+  /**
+   * The Xml format.
+   */
+  const CONTENT_TYPE_XML = 'application/xml';
+
+  /**
    * The Webhook ID.
    *
    * @var string

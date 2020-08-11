@@ -27,16 +27,6 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
   use StringTranslationTrait;
 
   /**
-   * The Json format.
-   */
-  const CONTENT_TYPE_JSON = 'application/json';
-
-  /**
-   * The Xml format.
-   */
-  const CONTENT_TYPE_XML = 'application/xml';
-
-  /**
    * The http client.
    *
    * @var \GuzzleHttp\Client
