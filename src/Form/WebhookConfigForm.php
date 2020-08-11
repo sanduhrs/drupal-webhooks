@@ -206,6 +206,35 @@ class WebhookConfigForm extends EntityForm {
       }
     }
 
+    $options['system:cron'] = [
+      'type' => $this->t('System Cron'),
+      'event' => 'Cron',
+    ];
+    $options['system:file_download'] = [
+      'type' => $this->t('File download'),
+      'event' => 'File download',
+    ];
+    $options['system:modules_installed'] = [
+      'type' => $this->t('Modules installed'),
+      'event' => 'Modules installed',
+    ];
+    $options['system:user_cancel'] = [
+      'type' => $this->t('User cancel'),
+      'event' => 'User cancel',
+    ];
+    $options['system:user_login'] = [
+      'type' => $this->t('User login'),
+      'event' => 'User login',
+    ];
+    $options['system:user_logout'] = [
+      'type' => $this->t('User logout'),
+      'event' => 'User logout',
+    ];
+    $options['system:cache_flush'] = [
+      'type' => $this->t('Cache flush'),
+      'event' => 'Cache flush',
+    ];
+
     \Drupal::moduleHandler()->alter('webhooks_event_info', $options);
 
     return $options;
