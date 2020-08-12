@@ -13,6 +13,24 @@ use Drupal\webhooks\Entity\WebhookConfig;
  */
 class WebhookConfigForm extends EntityForm {
 
+  protected $events = [];
+
+  protected $entityHooks = [
+    'create',
+    'update',
+    'delete',
+  ];
+
+  protected $systemHooks = [
+    'cron',
+    'file_download',
+    'modules_installed',
+    'user_cancel',
+    'user_login',
+    'user_logout',
+    'cache_flush',
+  ];
+
   /**
    * {@inheritdoc}
    */
@@ -109,11 +127,17 @@ class WebhookConfigForm extends EntityForm {
     $form['outgoing']['events'] = [
       '#title' => $this->t('Enabled Events'),
       '#type' => 'tableselect',
-      '#header' => ['type' => 'Entity Type' , 'event' => 'Event'],
+      '#header' => [
+        'type' => 'Hook / Event',
+        'event' => 'Machine name'
+      ],
       '#description' => $this->t("The Events you want to send to the endpoint."),
       '#options' => $this->eventOptions(),
       '#default_value' => $webhook_config->isNew() ? [] : $webhook_config->getEvents(),
     ];
+    if ($webhook_config->getType() === 'incoming') {
+      unset($form['outgoing']);
+    }
 
     $form['status'] = [
       '#type' => 'checkbox',
@@ -188,55 +212,27 @@ class WebhookConfigForm extends EntityForm {
    */
   protected function eventOptions() {
     $entity_types = \Drupal::entityTypeManager()->getDefinitions();
-    $operations = [
-      'create',
-      'update',
-      'delete',
-    ];
 
     $options = [];
-    foreach ($entity_types as $id => $definition) {
+    foreach ($entity_types as $entity_type => $definition) {
       if ($definition->entityClassImplements('\Drupal\Core\Entity\ContentEntityInterface')) {
-        foreach ($operations as $operation) {
-          $options['entity:' . $id . ':' . $operation] = [
-            'type' => $definition->getLabel(),
-            'event' => ucfirst($operation),
+        foreach ($this->entityHooks as $hook) {
+          $options['entity:' . $entity_type . ':' . $hook] = [
+            'type' => $this->t('Hook: %entity_label', ['%entity_label' => ucfirst($definition->getLabel())]),
+            'event' => 'entity:' . $entity_type . ':' . $hook,
           ];
         }
       }
     }
 
-    $options['system:cron'] = [
-      'type' => $this->t('System Cron'),
-      'event' => 'Cron',
-    ];
-    $options['system:file_download'] = [
-      'type' => $this->t('File download'),
-      'event' => 'File download',
-    ];
-    $options['system:modules_installed'] = [
-      'type' => $this->t('Modules installed'),
-      'event' => 'Modules installed',
-    ];
-    $options['system:user_cancel'] = [
-      'type' => $this->t('User cancel'),
-      'event' => 'User cancel',
-    ];
-    $options['system:user_login'] = [
-      'type' => $this->t('User login'),
-      'event' => 'User login',
-    ];
-    $options['system:user_logout'] = [
-      'type' => $this->t('User logout'),
-      'event' => 'User logout',
-    ];
-    $options['system:cache_flush'] = [
-      'type' => $this->t('Cache flush'),
-      'event' => 'Cache flush',
-    ];
+    foreach ($this->systemHooks as $hook) {
+      $options['hook:' . $hook] = [
+        'type' => $this->t('Hook: %hook', ['%hook' => ucfirst($hook)]),
+        'event' => 'system:' . $hook,
+      ];
+    }
 
     \Drupal::moduleHandler()->alter('webhooks_event_info', $options);
-
     return $options;
   }
 
