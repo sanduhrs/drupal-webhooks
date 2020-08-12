@@ -226,7 +226,7 @@ class WebhookConfigForm extends EntityForm {
     }
 
     foreach ($this->systemHooks as $hook) {
-      $options['hook:' . $hook] = [
+      $options['system:' . $hook] = [
         'type' => $this->t('Hook: %hook', ['%hook' => ucfirst($hook)]),
         'event' => 'system:' . $hook,
       ];
