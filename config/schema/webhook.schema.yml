@@ -38,3 +38,6 @@ webhooks.webhook.*:
     content_type:
       type: string
       label: 'Content Type'
+    non_blocking:
+      type: boolean
+      label: 'Non-Blocking'

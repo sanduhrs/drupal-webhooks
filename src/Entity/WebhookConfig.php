@@ -139,6 +139,13 @@ class WebhookConfig extends ConfigEntityBase implements WebhookConfigInterface {
   protected $secret;
 
   /**
+   * Is non-blocking?
+   *
+   * @var bool
+   */
+  protected $non_blocking;
+
+  /**
    * {@inheritdoc}
    */
   public function __construct(array $values, $entity_type) {
@@ -257,6 +264,15 @@ class WebhookConfig extends ConfigEntityBase implements WebhookConfigInterface {
    */
   public function getSecret() {
     return $this->secret;
+  }
+
+  /**
+   * Is non-blocking?
+   *
+   * @return bool
+   */
+  public function isNonBlocking() {
+    return $this->non_blocking;
   }
 
   /**

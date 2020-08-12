@@ -250,11 +250,17 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
       Webhook::verify($webhook_config->getSecret(), $request->getContent(), $webhook->getSignature());
     }
 
-    // Dispatch Webhook Receive event.
-    $this->eventDispatcher->dispatch(
-      WebhookEvents::RECEIVE,
-      new ReceiveEvent($webhook_config, $webhook)
-    );
+    if ($webhook_config->isNonBlocking()) {
+      \Drupal::queue('webhooks_dispatcher', TRUE)
+        ->createItem(['id' => $name, 'webhook' => $webhook]);
+    }
+    else {
+      // Dispatch Webhook Receive event.
+      $this->eventDispatcher->dispatch(
+        WebhookEvents::RECEIVE,
+        new ReceiveEvent($webhook_config, $webhook)
+      );
+    }
 
     if (!$webhook->getStatus()) {
       $this->logger->warning(
