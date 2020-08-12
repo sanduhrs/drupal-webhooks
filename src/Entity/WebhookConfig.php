@@ -30,9 +30,8 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     "type",
  *     "events",
  *     "content_type",
- *     "ref_entity_type",
- *     "ref_entity_id",
- *     "secret"
+ *     "secret",
+ *     "non_blocking"
  *   },
  *   admin_permission = "administer webhooks",
  *   entity_keys = {
