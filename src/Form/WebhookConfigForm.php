@@ -88,7 +88,33 @@ class WebhookConfigForm extends EntityForm {
       '#description' => $this->t('For <strong>incoming webhooks</strong> this secret is provided by the remote website. For <strong>outgoing webhooks</strong> this secret should be used for the incoming hook configuration on the remote website.'),
       '#default_value' => $webhook_config->getSecret(),
     ];
-    $form['non_blocking'] = [
+    $form['incoming'] = [
+      '#title' => $this->t('Incoming Webhook Settings'),
+      '#type' => 'details',
+      '#collapsible' => TRUE,
+      '#collapsed' => FALSE,
+      '#states' => [
+        'expanded' => [
+          ':input[name="type"]' => ['value' => 'incoming'],
+        ],
+        'enabled' => [
+          ':input[name="type"]' => ['value' => 'incoming'],
+        ],
+        'required' => [
+          ':input[name="type"]' => ['value' => 'incoming'],
+        ],
+        'collapsed' => [
+          ':input[name="type"]' => ['value' => 'outgoing'],
+        ],
+        'disabled' => [
+          ':input[name="type"]' => ['value' => 'outgoing'],
+        ],
+        'optional' => [
+          ':input[name="type"]' => ['value' => 'outgoing'],
+        ],
+      ],
+    ];
+    $form['incoming']['non_blocking'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Non-blocking'),
       '#default_value' => $webhook_config->isNonBlocking(),
@@ -144,6 +170,9 @@ class WebhookConfigForm extends EntityForm {
     if ($webhook_config->getType() === 'incoming') {
       unset($form['outgoing']);
     }
+    if ($webhook_config->getType() === 'outgoing') {
+      unset($form['incoming']);
+    }
 
     $form['status'] = [
       '#type' => 'checkbox',
@@ -181,7 +210,6 @@ class WebhookConfigForm extends EntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook_config */
     $webhook_config = $this->entity;
-    $webhook_config->set('non_blocking', $form['non_blocking']['#value']);
     // Keep the old secret if no new one has been given.
     if (empty($form_state->getValue('secret'))) {
       $webhook_config->set('secret', $form['secret']['#default_value']);

@@ -89,4 +89,12 @@ interface WebhookConfigInterface extends ConfigEntityInterface {
    */
   public function getSecret();
 
+  /**
+   * Is non-blocking?
+   *
+   * @return bool
+   *   Whether the webhook is non-blocking.
+   */
+  public function isNonBlocking();
+
 }
