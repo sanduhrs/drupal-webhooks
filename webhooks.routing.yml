@@ -14,3 +14,11 @@ webhooks.webhook_toggle_active:
   requirements:
     _csrf_token: 'TRUE'
     _permission: 'administer webhooks'
+
+webhooks.admin_settings:
+  path: '/admin/config/services/webhook/settings'
+  defaults:
+    _title: 'Settings'
+    _form: 'Drupal\webhooks\Form\SettingsForm'
+  requirements:
+    _permission: 'administer webhooks'

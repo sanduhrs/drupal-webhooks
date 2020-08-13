@@ -3,6 +3,7 @@
 namespace Drupal\webhooks;
 
 use Drupal\Component\Uuid\UuidInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
@@ -76,6 +77,13 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
   protected $uuid;
 
   /**
+   * The config object.
+   *
+   * @var \Drupal\Core\Config\ImmutableConfig
+   */
+  protected $config;
+
+  /**
    * WebhooksService constructor.
    *
    * @param \GuzzleHttp\Client $client
@@ -92,6 +100,8 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
    *   The serializer.
    * @param \Drupal\Component\Uuid\UuidInterface $uuid
    *   The Uuid service.
+   * @param ConfigFactoryInterface $config_factory
+   *   The config factory.
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
@@ -103,7 +113,8 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
       EventDispatcherInterface $event_dispatcher,
       EntityTypeManagerInterface $entity_type_manager,
       Serializer $serializer,
-      UuidInterface $uuid
+      UuidInterface $uuid,
+      ConfigFactoryInterface $config_factory
   ) {
     $this->client = $client;
     $this->logger = $logger_factory->get('webhooks');
@@ -112,6 +123,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
     $this->webhookStorage = $entity_type_manager->getStorage('webhook_config');
     $this->serializer = $serializer;
     $this->uuid = $uuid;
+    $this->config = $config_factory->get('webhooks.settings');
   }
 
   /**
@@ -251,7 +263,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
     }
 
     if ($webhook_config->isNonBlocking()) {
-      \Drupal::queue('webhooks_dispatcher', TRUE)
+      \Drupal::queue('webhooks_dispatcher', $this->config->get('reliable'))
         ->createItem(['id' => $name, 'webhook' => $webhook]);
     }
     else {
